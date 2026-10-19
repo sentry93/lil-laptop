@@ -3,7 +3,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","desc
   'use strict';
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const collection = document.querySelector('#collection');
-  const sideButtons = [...document.querySelectorAll('[data-side]')];
+  const sideButtons = [...collection.querySelectorAll('[data-side]')];
   sideButtons.forEach(button => button.addEventListener('click', () => {
     const back = button.dataset.side === 'back';
     collection.classList.toggle('show-lids', back);
@@ -141,63 +141,114 @@ const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","desc
   const heroImage = document.querySelector('.hero-device');
   const heroSurface = document.querySelector('.render-surface');
   const heroLabel = document.querySelector('#hero-model-name');
-  const pauseButton = document.querySelector('#hero-pause');
-  const looks = models.flatMap(model => model.variants.map(variant=>({model:model.name,...variant})));
-  let lookIndex=looks.findIndex(look=>look.id==='hotpink');
-  let heroTimer=null, heroMotion=null, heroHover=false, heroFocus=false, heroManual=false;
-  const paused = () => reduced.matches || document.hidden || heroHover || heroFocus || heroManual;
-  function scheduleHero() {
-    clearTimeout(heroTimer); heroTimer=null;
-    if (!paused()) heroTimer=setTimeout(cycleHero,2800);
+  const heroButton = document.querySelector('#hero-device-button');
+  const looks = [
+    {id:'blue',name:'Blueberry',open:'hero-blue-open.webp',closed:'hero-blue-closed.webp'},
+    {id:'orange',name:'Tangerine',open:'hero-orange-open.webp',closed:'hero-orange-closed.webp'}
+  ];
+  const decorationChoices = Object.keys(stickerNames);
+  let lookIndex=0, decorationIndex=0, heroClosed=false;
+  let heroTimer=null, heroMotion=null, heroHover=false, heroFocus=false, transitionID=0;
+  const paused = () => reduced.matches || document.hidden || heroHover || heroFocus || heroClosed;
+  function paintHero() {
+    const look=looks[lookIndex];
+    heroImage.src=heroClosed?look.closed:look.open;
+    heroImage.alt=heroClosed?`Closed ${look.name} Jelly Notebook lid on iPhone Duo.`:`${look.name} Jelly Notebook on iPhone Duo in the angled open pose, with a black interior surround and small deck stickers.`;
+    heroLabel.textContent=`Jelly Notebook / ${look.name}`;
+    heroButton.dataset.side=heroClosed?'closed':'open';
+    heroButton.setAttribute('aria-pressed',String(heroClosed));
+    heroButton.setAttribute('aria-label',heroClosed?`Spin to open the ${look.name} Jelly Notebook`:`Spin to see the closed ${look.name} Jelly Notebook lid`);
   }
-  async function cycleHero() {
-    heroTimer=null;
-    if (paused()) return;
+  function changeDecorations() {
+    decorationIndex=(decorationIndex+7)%decorationChoices.length;
+    const slots=[document.querySelector('#hero-ornament-left'),document.querySelector('#hero-ornament-right'),...document.querySelectorAll('[data-deck-sticker]')];
+    slots.forEach((slot,index)=>{
+      const kind=decorationChoices[(decorationIndex+index*5)%decorationChoices.length];
+      if(slot.tagName.toLowerCase()==='image')slot.setAttribute('href',`sticker-${kind}.webp`);
+      else slot.src=`sticker-${kind}.webp`;
+    });
+  }
+  function scheduleHero() {
+    clearTimeout(heroTimer);heroTimer=null;
+    heroArt.classList.toggle('is-paused',paused());
+    if(!paused()&&!heroMotion)heroTimer=setTimeout(cycleHero,3400);
+  }
+  function cancelHeroMotion() {
+    transitionID++;
+    if(heroMotion){heroMotion.cancel();heroMotion=null;}
+    clearTimeout(heroTimer);heroTimer=null;
+  }
+  async function moveHero(change,spin=false) {
+    cancelHeroMotion();
+    const token=transitionID;
+    if(reduced.matches){change();paintHero();scheduleHero();return;}
+    let motion=null;
     try {
-      heroMotion=heroSurface.animate([
-        {translate:'0 0',scale:'1'}, {translate:'0 8px',scale:'1.015 .97',offset:.35},
-        {translate:'0 -32px',scale:'.92 1.02',opacity:0}
-      ],{duration:260,easing:'ease-in',fill:'forwards'});
-      await heroMotion.finished;
-      if (paused()) return;
-      lookIndex=(lookIndex+1)%looks.length;
-      const look=looks[lookIndex];
-      heroImage.src=look.front;
-      heroImage.alt=`${look.model} in ${look.name} on iPhone Duo, with its desktop and keyboard.`;
-      heroLabel.textContent=`${look.model} / ${look.name}`;
+      motion=heroSurface.animate(spin?[
+        {transform:'perspective(1000px) rotateY(0deg)',opacity:1},
+        {transform:'perspective(1000px) rotateY(90deg)',opacity:.5}
+      ]:[
+        {translate:'0 0',scale:'1',opacity:1},
+        {translate:'0 6px',scale:'1.015 .97',opacity:1,offset:.35},
+        {translate:'0 -24px',scale:'.96 1.02',opacity:0}
+      ],{duration:spin?240:220,easing:'ease-in',fill:'forwards'});
+      heroMotion=motion;
+      await motion.finished;
+      if(token!==transitionID)return;
+      change();paintHero();
       await heroImage.decode().catch(()=>{});
-      heroMotion.cancel();
-      heroMotion=heroSurface.animate([
-        {translate:'0 -32px',scale:'.93 1.03',opacity:0},
-        {translate:'0 10px',scale:'1.03 .96',opacity:1,offset:.53},
-        {translate:'0 -5px',scale:'.99 1.01',opacity:1,offset:.78},
+      if(token!==transitionID)return;
+      motion.cancel();
+      motion=heroSurface.animate(spin?[
+        {transform:'perspective(1000px) rotateY(270deg)',opacity:.5},
+        {transform:'perspective(1000px) rotateY(360deg)',opacity:1}
+      ]:[
+        {translate:'0 -24px',scale:'.96 1.02',opacity:0},
+        {translate:'0 7px',scale:'1.025 .98',opacity:1,offset:.5},
+        {translate:'0 -3px',scale:'.995 1.005',opacity:1,offset:.8},
         {translate:'0 0',scale:'1',opacity:1}
-      ],{duration:620,easing:'cubic-bezier(.2,.7,.25,1)',fill:'forwards'});
-      if (paused()) heroMotion.pause();
-      await heroMotion.finished;
-    } catch (_) { /* Cancelled when motion preferences change. */ }
-    finally { if(heroMotion){heroMotion.cancel();heroMotion=null;} scheduleHero(); }
+      ],{duration:spin?500:560,easing:'cubic-bezier(.2,.7,.25,1)',fill:'forwards'});
+      heroMotion=motion;
+      if(!spin && paused())motion.pause();
+      await motion.finished;
+    }catch(_){ /* A new click or pointer exit replaces the previous motion. */ }
+    finally {
+      if(motion)motion.cancel();
+      if(token===transitionID){heroMotion=null;scheduleHero();}
+    }
+  }
+  function cycleHero() {
+    heroTimer=null;
+    if(paused())return;
+    moveHero(()=>{lookIndex=(lookIndex+1)%looks.length;changeDecorations();});
   }
   function syncHero() {
     heroArt.classList.toggle('is-paused',paused());
-    clearTimeout(heroTimer); heroTimer=null;
-    if (heroMotion) { if(paused()) heroMotion.pause(); else heroMotion.play(); }
-    else scheduleHero();
+    clearTimeout(heroTimer);heroTimer=null;
+    // Pointer hover holds an automatic bounce, while deliberate spin clicks always finish.
+    if(heroMotion && !heroClosed && !heroButton.dataset.spinning){if(paused())heroMotion.pause();else heroMotion.play();}
+    else if(!heroMotion)scheduleHero();
   }
-  heroArt.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'){heroHover=true;syncHero();}});
-  heroArt.addEventListener('pointerleave',()=>{heroHover=false;syncHero();});
-  heroArt.addEventListener('focusin',()=>{heroFocus=true;syncHero();});
-  heroArt.addEventListener('focusout',event=>{if(!heroArt.contains(event.relatedTarget)){heroFocus=false;syncHero();}});
-  pauseButton.addEventListener('click',()=>{
-    heroManual=!heroManual;
-    pauseButton.setAttribute('aria-pressed',String(heroManual));
-    pauseButton.setAttribute('aria-label',heroManual?'Resume laptop preview animation':'Pause laptop preview animation');
-    pauseButton.textContent=heroManual?'play ↗':'pause ↙'; syncHero();
+  heroButton.addEventListener('click',()=>{
+    const next=!heroClosed;
+    heroButton.dataset.spinning='true';
+    moveHero(()=>{heroClosed=next;},true).finally(()=>{delete heroButton.dataset.spinning;scheduleHero();});
   });
-  document.addEventListener('visibilitychange',syncHero);
-  reduced.addEventListener('change',()=>{if(heroMotion){heroMotion.cancel();heroMotion=null;}syncHero();});
-  // Cache the small native renders so each change stays smooth.
-  looks.forEach(look=>{const image=new Image(); image.src=look.front;});
+  heroArt.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'){heroHover=true;syncHero();}});
+  heroArt.addEventListener('pointerleave',()=>{
+    heroHover=false;
+    delete heroButton.dataset.spinning;
+    cancelHeroMotion();
+    heroClosed=false;paintHero();scheduleHero();
+  });
+  heroButton.addEventListener('focusin',()=>{heroFocus=heroButton.matches(':focus-visible');syncHero();});
+  heroButton.addEventListener('focusout',()=>{heroFocus=false;heroClosed=false;cancelHeroMotion();paintHero();scheduleHero();});
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden){cancelHeroMotion();heroClosed=false;paintHero();}
+    scheduleHero();
+  });
+  reduced.addEventListener('change',()=>{cancelHeroMotion();heroClosed=false;paintHero();scheduleHero();});
+  looks.forEach(look=>[look.open,look.closed].forEach(src=>{const image=new Image();image.src=src;}));
   scheduleHero();
 
   const tilt = document.querySelector('.tilt');
