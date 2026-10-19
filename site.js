@@ -8,7 +8,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","desc
     const back = button.dataset.side === 'back';
     collection.classList.toggle('show-lids', back);
     sideButtons.forEach(b => b.setAttribute('aria-pressed', String(b === button)));
-    document.querySelector('#collection-caption').textContent = back ? 'A very good other side.' : 'The inside story.';
+    document.querySelector('#collection-caption').textContent = back ? 'A little personality, all around.' : 'Pick your alter ego.';
     document.querySelectorAll('.device-front').forEach(face => face.setAttribute('aria-hidden', String(back)));
     document.querySelectorAll('.device-back').forEach(face => face.setAttribute('aria-hidden', String(!back)));
   }));
@@ -47,7 +47,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","desc
   const canvas = document.querySelector('#sticker-canvas');
   const placed = document.querySelector('#placed-stickers');
   const status = document.querySelector('#playground-status');
-  const stickerNames = {'bow':'Checked Bow','flower':'Power Flower','make-stuff':'Make Stuff','open-late':'Open Late'};
+  const stickerNames = {"bow": "Checked Bow", "flower": "Power Flower", "make-stuff": "Make Stuff", "open-late": "Open Late", "circuit-club-01": "Desktop Garden", "circuit-club-02": "Side A", "circuit-club-03": "Pocket Rangefinder", "circuit-club-04": "Patch Cable", "circuit-club-05": "Waveform Lab", "circuit-club-06": "Keycap Trio", "circuit-club-07": "Minute Keeper", "circuit-club-08": "Extra Life", "circuit-club-09": "Save Something", "circuit-club-10": "Human Inside", "circuit-club-11": "Orbital Relay", "wayfarer-01": "Lunar Moth", "wayfarer-02": "Quiet Heron", "wayfarer-03": "Fern Frond", "wayfarer-04": "Long Way Home", "wayfarer-05": "Forest Floor", "wayfarer-06": "Slow Traveller", "wayfarer-07": "Jewel Beetle", "wayfarer-08": "Silver Sardine", "wayfarer-09": "Ribbon Snake", "wayfarer-10": "Moon Study", "wayfarer-11": "Wild Stems", "wayfarer-12": "Elsewhere Map", "fruit-stand-01": "Late Lunch Tin", "fruit-stand-02": "Iced Matcha", "fruit-stand-03": "Blue Espresso", "fruit-stand-04": "Special Delivery", "fruit-stand-05": "Night Owl Matches", "fruit-stand-06": "Striped Vase", "fruit-stand-07": "Red Canvas", "fruit-stand-08": "Lucky Charms", "fruit-stand-10": "Good Eggs", "fruit-stand-11": "Day Dream Bottle", "fruit-stand-12": "One More Chapter", "type-and-play-02": "Soft Ware", "type-and-play-04": "Stay Curious", "type-and-play-05": "Slow Is A Speed", "type-and-play-06": "And Then Some", "type-and-play-07": "Less But Better", "type-and-play-08": "One More Page", "type-and-play-09": "Local Only", "type-and-play-10": "Side Quest", "type-and-play-11": "A Little Wonder", "type-and-play-12": "Good Enough"};
   const spots = [[.26,.36,-15],[.74,.59,12],[.35,.70,-8],[.68,.29,15],[.49,.45,-17],[.22,.57,7],[.73,.75,-6],[.55,.24,13]];
   let sequence = 0;
   let layer = 1;
@@ -113,6 +113,92 @@ const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","desc
     status.textContent = 'A fresh lid. Make it yours.';
   });
   addSticker('bow',false); addSticker('make-stuff',false);
+
+  const gallery = document.querySelector('.models-grid');
+  document.querySelectorAll('[data-gallery-step]').forEach(button => button.addEventListener('click', () => {
+    gallery.scrollBy({left:Number(button.dataset.galleryStep)*(gallery.querySelector('.model-card').getBoundingClientRect().width+30), behavior:reduced.matches?'instant':'smooth'});
+  }));
+  gallery.addEventListener('keydown', event => {
+    if (event.target !== gallery || !['ArrowLeft','ArrowRight'].includes(event.key)) return;
+    event.preventDefault(); gallery.scrollBy({left:(event.key==='ArrowRight'?1:-1)*320,behavior:reduced.matches?'instant':'smooth'});
+  });
+  const tray = document.querySelector('.sticker-tray');
+  document.querySelectorAll('[data-stickers-step]').forEach(button => button.addEventListener('click', () => {
+    tray.scrollBy({left:Number(button.dataset.stickersStep)*tray.clientWidth*.8,behavior:reduced.matches?'instant':'smooth'});
+  }));
+  // A mouse can pull the collection like a row of objects. Buttons keep their own click behaviour.
+  let shelfDrag = null;
+  gallery.addEventListener('pointerdown',event => {
+    if (event.pointerType !== 'mouse' || event.button !== 0 || event.target.closest('button,a')) return;
+    shelfDrag={x:event.clientX,left:gallery.scrollLeft}; gallery.setPointerCapture(event.pointerId);
+  });
+  gallery.addEventListener('pointermove',event => {
+    if (shelfDrag) gallery.scrollLeft=shelfDrag.left+shelfDrag.x-event.clientX;
+  });
+  ['pointerup','pointercancel','lostpointercapture'].forEach(type => gallery.addEventListener(type,()=>shelfDrag=null));
+
+  const heroArt = document.querySelector('.hero-art');
+  const heroImage = document.querySelector('.hero-device');
+  const heroSurface = document.querySelector('.render-surface');
+  const heroLabel = document.querySelector('#hero-model-name');
+  const pauseButton = document.querySelector('#hero-pause');
+  const looks = models.flatMap(model => model.variants.map(variant=>({model:model.name,...variant})));
+  let lookIndex=looks.findIndex(look=>look.id==='hotpink');
+  let heroTimer=null, heroMotion=null, heroHover=false, heroFocus=false, heroManual=false;
+  const paused = () => reduced.matches || document.hidden || heroHover || heroFocus || heroManual;
+  function scheduleHero() {
+    clearTimeout(heroTimer); heroTimer=null;
+    if (!paused()) heroTimer=setTimeout(cycleHero,2800);
+  }
+  async function cycleHero() {
+    heroTimer=null;
+    if (paused()) return;
+    try {
+      heroMotion=heroSurface.animate([
+        {translate:'0 0',scale:'1'}, {translate:'0 8px',scale:'1.015 .97',offset:.35},
+        {translate:'0 -32px',scale:'.92 1.02',opacity:0}
+      ],{duration:260,easing:'ease-in',fill:'forwards'});
+      await heroMotion.finished;
+      if (paused()) return;
+      lookIndex=(lookIndex+1)%looks.length;
+      const look=looks[lookIndex];
+      heroImage.src=look.front;
+      heroImage.alt=`${look.model} in ${look.name} on iPhone Duo, with its desktop and keyboard.`;
+      heroLabel.textContent=`${look.model} / ${look.name}`;
+      await heroImage.decode().catch(()=>{});
+      heroMotion.cancel();
+      heroMotion=heroSurface.animate([
+        {translate:'0 -32px',scale:'.93 1.03',opacity:0},
+        {translate:'0 10px',scale:'1.03 .96',opacity:1,offset:.53},
+        {translate:'0 -5px',scale:'.99 1.01',opacity:1,offset:.78},
+        {translate:'0 0',scale:'1',opacity:1}
+      ],{duration:620,easing:'cubic-bezier(.2,.7,.25,1)',fill:'forwards'});
+      if (paused()) heroMotion.pause();
+      await heroMotion.finished;
+    } catch (_) { /* Cancelled when motion preferences change. */ }
+    finally { if(heroMotion){heroMotion.cancel();heroMotion=null;} scheduleHero(); }
+  }
+  function syncHero() {
+    heroArt.classList.toggle('is-paused',paused());
+    clearTimeout(heroTimer); heroTimer=null;
+    if (heroMotion) { if(paused()) heroMotion.pause(); else heroMotion.play(); }
+    else scheduleHero();
+  }
+  heroArt.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'){heroHover=true;syncHero();}});
+  heroArt.addEventListener('pointerleave',()=>{heroHover=false;syncHero();});
+  heroArt.addEventListener('focusin',()=>{heroFocus=true;syncHero();});
+  heroArt.addEventListener('focusout',event=>{if(!heroArt.contains(event.relatedTarget)){heroFocus=false;syncHero();}});
+  pauseButton.addEventListener('click',()=>{
+    heroManual=!heroManual;
+    pauseButton.setAttribute('aria-pressed',String(heroManual));
+    pauseButton.setAttribute('aria-label',heroManual?'Resume laptop preview animation':'Pause laptop preview animation');
+    pauseButton.textContent=heroManual?'play ↗':'pause ↙'; syncHero();
+  });
+  document.addEventListener('visibilitychange',syncHero);
+  reduced.addEventListener('change',()=>{if(heroMotion){heroMotion.cancel();heroMotion=null;}syncHero();});
+  // Cache the small native renders so each change stays smooth.
+  looks.forEach(look=>{const image=new Image(); image.src=look.front;});
+  scheduleHero();
 
   const tilt = document.querySelector('.tilt');
   let frame = null;
