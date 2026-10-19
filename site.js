@@ -40,7 +40,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","desc
     document.querySelectorAll('[data-os]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
     desktopImage.src = `desktop-${button.dataset.os}.webp`;
     desktopImage.alt = `${name} desktop interface preview from lil laptop.`;
-    document.querySelector('#desktop-label').textContent = `${name} / ${year}`;
+    document.querySelector('#desktop-label').textContent = name;
     if (!reduced.matches) desktopImage.animate([{opacity:.25},{opacity:1}], {duration:350,easing:'ease-out'});
   }));
 
