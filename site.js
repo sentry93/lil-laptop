@@ -2,6 +2,50 @@ const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","desc
 (() => {
   'use strict';
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  const copyOptions = {
+    hero: [
+      ['new laptop','who dis'], ['hello,','again.'], ['your phone.','your laptop.'],
+      ['hello,','colour.'], ['old soul.','new screen.'], ['little laptop.','big personality.']
+    ],
+    footer: [
+      ['hello,','again.'], ['new laptop','who dis'], ['your other','good side.'],
+      ['room for','your ideas.'], ['make it','personal.'], ['big lid','energy.']
+    ]
+  };
+  document.querySelectorAll('[data-copy-picker]').forEach(picker => {
+    const key=picker.dataset.copyPicker, choices=copyOptions[key];
+    const trigger=picker.querySelector('.copy-title'), menu=picker.querySelector('.copy-menu');
+    let selected=0;
+    try {const saved=Number(localStorage.getItem(`lil-laptop-copy-${key}`));if(Number.isInteger(saved)&&saved>=0&&saved<choices.length)selected=saved;}catch(_){}
+    function paintCopy() {
+      picker.querySelector('[data-copy-first]').textContent=choices[selected][0];
+      picker.querySelector('[data-copy-second]').textContent=choices[selected][1];
+      trigger.setAttribute('aria-label',`${choices[selected].join(' ')}. Choose ${key==='hero'?'homepage':'footer'} headline`);
+      menu.querySelectorAll('button').forEach((b,i)=>b.setAttribute('aria-checked',String(i===selected)));
+    }
+    function closeCopy(restore=false){menu.hidden=true;trigger.setAttribute('aria-expanded','false');if(restore)trigger.focus();}
+    function openCopy(){menu.hidden=false;trigger.setAttribute('aria-expanded','true');menu.querySelectorAll('button')[selected].focus();}
+    choices.forEach((lines,index)=>{
+      const option=document.createElement('button');option.type='button';option.setAttribute('role','menuitemradio');
+      option.textContent=lines.join(' / ');
+      option.addEventListener('click',()=>{selected=index;paintCopy();try{localStorage.setItem(`lil-laptop-copy-${key}`,String(index));}catch(_){}closeCopy(true);});
+      menu.append(option);
+    });
+    trigger.addEventListener('click',()=>{if(menu.hidden)openCopy();else closeCopy();});
+    trigger.addEventListener('keydown',event=>{if(['ArrowDown','ArrowUp'].includes(event.key)){event.preventDefault();openCopy();}});
+    menu.addEventListener('keydown',event=>{
+      const buttons=[...menu.querySelectorAll('button')],current=buttons.indexOf(document.activeElement);
+      if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){
+        event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?buttons.length-1:(current+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length;buttons[next].focus();
+      }else if(event.key==='Escape'){event.preventDefault();closeCopy(true);}
+      else if(event.key==='Tab')closeCopy();
+    });
+    document.addEventListener('click',event=>{if(!picker.contains(event.target))closeCopy();});
+    picker.addEventListener('focusout',event=>{if(!picker.contains(event.relatedTarget))closeCopy();});
+    paintCopy();
+  });
+
   const collection = document.querySelector('#collection');
   const sideButtons = [...collection.querySelectorAll('[data-side]')];
   sideButtons.forEach(button => button.addEventListener('click', () => {
@@ -143,44 +187,69 @@ const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","desc
   const heroLabel = document.querySelector('#hero-model-name');
   const heroButton = document.querySelector('#hero-device-button');
   const looks = [
-    {id:'blue',name:'Blueberry',open:'hero-blue-open.webp',closed:'hero-blue-closed.webp'},
-    {id:'orange',name:'Tangerine',open:'hero-orange-open.webp',closed:'hero-orange-closed.webp'}
-  ];
+    {id:'blue',name:'Jelly Notebook / Blueberry'},
+    {id:'power',name:'Power Notebook / Graphite'},
+    {id:'orange',name:'Jelly Notebook / Tangerine'},
+    {id:'snow',name:'Snow Notebook / White'},
+    {id:'studio',name:'Studio Pro / Space Gray'}
+  ].map(look=>({...look,open:`hero-${look.id}-open.webp`,rear:`hero-${look.id}-rear.webp`}));
   const decorationChoices = Object.keys(stickerNames);
-  let lookIndex=0, decorationIndex=0, heroClosed=false;
+  const deckLayouts = [[[1.33257, 0.15715, -0.41974, 0.83388, 150.048, 747.356]], [[1.21418, 0.55567, -0.85289, 0.74353, 678.793, 857.279]], [[1.18913, 0.06161, -0.23191, 0.72726, 168.432, 723.095], [0.96033, 0.43762, -0.83238, 0.6305, 170.907, 787.325]], [[1.15795, 0.48914, -0.75404, 0.70528, 681.511, 838.569], [1.23453, 0.06965, -0.08422, 0.82279, 619.632, 942.954]], [[1.32041, 0.18609, -0.47164, 0.83003, 140.348, 750.682], [1.12384, 0.55845, -0.85187, 0.69379, 670.154, 881.828]], [[1.09999, 0.45313, -0.88951, 0.70588, 172.98, 743.15], [1.27596, 0.09748, -0.12626, 0.81982, 639.265, 860.14], [0.95171, 0.45132, -0.67307, 0.60288, 663.977, 934.311]]];
+  const deckSlots=[...document.querySelectorAll('[data-deck-sticker]')];
+  const cloudSlots=[...document.querySelectorAll('[data-cloud-sticker] img')];
+  let lookIndex=0, heroRear=false, lastDeckLayout=-1, lastCloudSlot=-1;
   let heroTimer=null, heroMotion=null, heroHover=false, heroFocus=false, transitionID=0;
-  const paused = () => reduced.matches || document.hidden || heroHover || heroFocus || heroClosed;
-  function paintHero() {
-    const look=looks[lookIndex];
-    heroImage.src=heroClosed?look.closed:look.open;
-    heroImage.alt=heroClosed?`Closed ${look.name} Jelly Notebook lid on iPhone Duo.`:`${look.name} Jelly Notebook on iPhone Duo in the angled open pose, with a black interior surround and small deck stickers.`;
-    heroLabel.textContent=`Jelly Notebook / ${look.name}`;
-    heroButton.dataset.side=heroClosed?'closed':'open';
-    heroButton.setAttribute('aria-pressed',String(heroClosed));
-    heroButton.setAttribute('aria-label',heroClosed?`Spin to open the ${look.name} Jelly Notebook`:`Spin to see the closed ${look.name} Jelly Notebook lid`);
-  }
-  function changeDecorations() {
-    decorationIndex=(decorationIndex+7)%decorationChoices.length;
-    const slots=[document.querySelector('#hero-ornament-left'),document.querySelector('#hero-ornament-right'),...document.querySelectorAll('[data-deck-sticker]')];
-    slots.forEach((slot,index)=>{
-      const kind=decorationChoices[(decorationIndex+index*5)%decorationChoices.length];
-      if(slot.tagName.toLowerCase()==='image')slot.setAttribute('href',`sticker-${kind}.webp`);
-      else slot.src=`sticker-${kind}.webp`;
+  let cloudTimer=null;
+  function randomItem(items){return items[Math.floor(Math.random()*items.length)];}
+  function freshSticker(used=[]){return randomItem(decorationChoices.filter(kind=>!used.includes(`sticker-${kind}.webp`)));}
+  function changeDeck() {
+    // Different computers get a new little arrangement, including left-only and right-only looks.
+    const choices=deckLayouts.map((_,index)=>index).filter(index=>index!==lastDeckLayout);
+    lastDeckLayout=randomItem(choices);
+    const layout=deckLayouts[lastDeckLayout];heroButton.dataset.deckLayout=String(lastDeckLayout);
+    const used=[];
+    deckSlots.forEach((slot,index)=>{
+      slot.style.display=index<layout.length?'':'none';
+      if(index>=layout.length)return;
+      const kind=freshSticker(used),src=`sticker-${kind}.webp`;used.push(src);
+      slot.setAttribute('href',src);slot.setAttribute('transform',`matrix(${layout[index].join(',')})`);
     });
   }
+  function scheduleCloud(){
+    clearTimeout(cloudTimer);cloudTimer=null;
+    if(!reduced.matches&&!document.hidden)cloudTimer=setTimeout(cycleCloud,1100+Math.random()*1100);
+  }
+  async function cycleCloud(){
+    cloudTimer=null;
+    if(reduced.matches||document.hidden)return;
+    const index=randomItem(cloudSlots.map((_,i)=>i).filter(i=>i!==lastCloudSlot));lastCloudSlot=index;
+    const image=cloudSlots[index],src=`sticker-${freshSticker(cloudSlots.map(s=>s.getAttribute('src')))}.webp`;
+    const preload=new Image();preload.src=src;await preload.decode().catch(()=>{});
+    if(reduced.matches||document.hidden){scheduleCloud();return;}
+    let motion=image.animate([{opacity:1,scale:'1'},{opacity:0,scale:'.65',rotate:'-12deg'}],{duration:150,easing:'ease-in',fill:'forwards'});
+    await motion.finished.catch(()=>{});image.src=src;motion.cancel();
+    image.animate([{opacity:0,scale:'.65',rotate:'12deg'},{opacity:1,scale:'1.12',rotate:'-3deg',offset:.65},{opacity:1,scale:'1',rotate:'0deg'}],{duration:380,easing:'ease-out'});
+    scheduleCloud();
+  }
+  const paused = () => reduced.matches || document.hidden || heroHover || heroFocus || heroRear;
+  function paintHero() {
+    const look=looks[lookIndex];heroImage.src=heroRear?look.rear:look.open;
+    heroImage.alt=heroRear?`${look.name}, partly open with its back lid facing you on iPhone Duo.`:`${look.name} on iPhone Duo in the angled open pose, with stickers around its trackpad.`;
+    heroLabel.textContent=look.name;heroButton.dataset.look=look.id;
+    heroButton.dataset.side=heroRear?'back':'open';
+    heroButton.setAttribute('aria-pressed',String(heroRear));
+    heroButton.setAttribute('aria-label',heroRear?`Spin to the front of ${look.name}`:`Spin to the back of ${look.name}`);
+  }
   function scheduleHero() {
-    clearTimeout(heroTimer);heroTimer=null;
-    heroArt.classList.toggle('is-paused',paused());
-    if(!paused()&&!heroMotion)heroTimer=setTimeout(cycleHero,3400);
+    clearTimeout(heroTimer);heroTimer=null;heroArt.classList.toggle('is-paused',paused());
+    if(!paused()&&!heroMotion)heroTimer=setTimeout(cycleHero,3600);
   }
   function cancelHeroMotion() {
-    transitionID++;
-    if(heroMotion){heroMotion.cancel();heroMotion=null;}
+    transitionID++;if(heroMotion){heroMotion.cancel();heroMotion=null;}
     clearTimeout(heroTimer);heroTimer=null;
   }
   async function moveHero(change,spin=false) {
-    cancelHeroMotion();
-    const token=transitionID;
+    cancelHeroMotion();const token=transitionID;
     if(reduced.matches){change();paintHero();scheduleHero();return;}
     let motion=null;
     try {
@@ -192,13 +261,8 @@ const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","desc
         {translate:'0 6px',scale:'1.015 .97',opacity:1,offset:.35},
         {translate:'0 -24px',scale:'.96 1.02',opacity:0}
       ],{duration:spin?240:220,easing:'ease-in',fill:'forwards'});
-      heroMotion=motion;
-      await motion.finished;
-      if(token!==transitionID)return;
-      change();paintHero();
-      await heroImage.decode().catch(()=>{});
-      if(token!==transitionID)return;
-      motion.cancel();
+      heroMotion=motion;await motion.finished;if(token!==transitionID)return;
+      change();paintHero();await heroImage.decode().catch(()=>{});if(token!==transitionID)return;motion.cancel();
       motion=heroSurface.animate(spin?[
         {transform:'perspective(1000px) rotateY(270deg)',opacity:.5},
         {transform:'perspective(1000px) rotateY(360deg)',opacity:1}
@@ -208,48 +272,28 @@ const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","desc
         {translate:'0 -3px',scale:'.995 1.005',opacity:1,offset:.8},
         {translate:'0 0',scale:'1',opacity:1}
       ],{duration:spin?500:560,easing:'cubic-bezier(.2,.7,.25,1)',fill:'forwards'});
-      heroMotion=motion;
-      if(!spin && paused())motion.pause();
-      await motion.finished;
-    }catch(_){ /* A new click or pointer exit replaces the previous motion. */ }
-    finally {
-      if(motion)motion.cancel();
-      if(token===transitionID){heroMotion=null;scheduleHero();}
-    }
+      heroMotion=motion;await motion.finished;
+    }catch(_){ /* Pointer exit and new deliberate clicks replace the current motion. */ }
+    finally{if(motion)motion.cancel();if(token===transitionID){heroMotion=null;scheduleHero();}}
   }
-  function cycleHero() {
-    heroTimer=null;
-    if(paused())return;
-    moveHero(()=>{lookIndex=(lookIndex+1)%looks.length;changeDecorations();});
-  }
-  function syncHero() {
-    heroArt.classList.toggle('is-paused',paused());
-    clearTimeout(heroTimer);heroTimer=null;
-    // Pointer hover holds an automatic bounce, while deliberate spin clicks always finish.
-    if(heroMotion && !heroClosed && !heroButton.dataset.spinning){if(paused())heroMotion.pause();else heroMotion.play();}
-    else if(!heroMotion)scheduleHero();
+  function cycleHero(){heroTimer=null;if(!paused())moveHero(()=>{lookIndex=(lookIndex+1)%looks.length;changeDeck();});}
+  function syncHero(){
+    // Hover always holds a complete render, never a half-faded bounce frame.
+    if(heroMotion&&!heroButton.dataset.spinning){cancelHeroMotion();paintHero();}
+    scheduleHero();
   }
   heroButton.addEventListener('click',()=>{
-    const next=!heroClosed;
-    heroButton.dataset.spinning='true';
-    moveHero(()=>{heroClosed=next;},true).finally(()=>{delete heroButton.dataset.spinning;scheduleHero();});
+    const next=!heroRear;heroButton.dataset.spinning='true';
+    moveHero(()=>{heroRear=next;},true).finally(()=>{delete heroButton.dataset.spinning;scheduleHero();});
   });
   heroArt.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'){heroHover=true;syncHero();}});
-  heroArt.addEventListener('pointerleave',()=>{
-    heroHover=false;
-    delete heroButton.dataset.spinning;
-    cancelHeroMotion();
-    heroClosed=false;paintHero();scheduleHero();
-  });
+  heroArt.addEventListener('pointerleave',()=>{heroHover=false;delete heroButton.dataset.spinning;cancelHeroMotion();heroRear=false;paintHero();scheduleHero();});
   heroButton.addEventListener('focusin',()=>{heroFocus=heroButton.matches(':focus-visible');syncHero();});
-  heroButton.addEventListener('focusout',()=>{heroFocus=false;heroClosed=false;cancelHeroMotion();paintHero();scheduleHero();});
-  document.addEventListener('visibilitychange',()=>{
-    if(document.hidden){cancelHeroMotion();heroClosed=false;paintHero();}
-    scheduleHero();
-  });
-  reduced.addEventListener('change',()=>{cancelHeroMotion();heroClosed=false;paintHero();scheduleHero();});
-  looks.forEach(look=>[look.open,look.closed].forEach(src=>{const image=new Image();image.src=src;}));
-  scheduleHero();
+  heroButton.addEventListener('focusout',()=>{heroFocus=false;heroRear=false;cancelHeroMotion();paintHero();scheduleHero();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelHeroMotion();heroRear=false;paintHero();}scheduleHero();scheduleCloud();});
+  reduced.addEventListener('change',()=>{cancelHeroMotion();heroRear=false;paintHero();scheduleHero();scheduleCloud();});
+  looks.forEach(look=>[look.open,look.rear].forEach(src=>{const image=new Image();image.src=src;}));
+  changeDeck();paintHero();scheduleHero();scheduleCloud();
 
   const tilt = document.querySelector('.tilt');
   let frame = null;
