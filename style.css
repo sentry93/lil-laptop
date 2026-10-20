@@ -159,3 +159,45 @@ body.is-dragging-sticker,body.is-dragging-sticker *{cursor:grabbing!important}
 .collection .model-bottom{min-height:18px}
 .collection .device-back{padding:0;scale:1.25}
 @media(prefers-reduced-motion:reduce){.collection .device-flipper{animation:none}}
+
+/* The maker credit is one quiet sentence at every size. */
+.footer-credit{display:block}
+.footer-credit p,.footer-credit a{font:400 10px/1.6 Arial,Helvetica,sans-serif;color:#454a31;letter-spacing:0}
+.footer-credit p{margin:0}.footer-credit a{display:inline;text-decoration:none}
+.footer-credit a:hover{text-decoration:underline}
+@media(max-width:600px){
+ .hero-grid{min-height:0;padding-top:32px;gap:28px}
+ .hero-art{order:-1}
+ .hero-copy{width:100%}
+ .desktop-section .desktop-grid{display:flex;flex-direction:column;align-items:stretch;gap:0}
+ .desktop-section .desktop-copy{display:contents}
+ .desktop-section .desktop-copy>.eyebrow{order:0;margin-bottom:16px}
+ .desktop-section .desktop-copy>h2{order:1;margin-bottom:28px}
+ .desktop-section .desktop-showcase{order:2;margin:8px auto 26px}
+ .desktop-section .desktop-choices{order:3;margin:0 0 22px}
+ .desktop-section .desktop-copy>p:not(.eyebrow){order:4;margin:0 0 16px}
+ .collection .models-grid{gap:12px;padding-top:12px}
+ .collection .model-card,.collection .model-card[data-model=ibook1999]{padding:0 7px 8px}
+ .collection .model-stage{height:clamp(245px,72vw,300px);margin:0 0 -4px}
+ .collection .model-card h3,.collection .model-card[data-model=ibook1999] h3{margin-top:5px;margin-bottom:8px}
+ .collection .model-card>p{margin-bottom:4px}
+ .personal-studio .personal-grid{display:flex;flex-direction:column;align-items:stretch;gap:0}
+ .personal-studio .personal-copy{display:contents}
+ .personal-studio .personal-copy>.eyebrow{order:0;margin-bottom:14px}
+ .personal-studio .personal-copy>h2{order:1;margin-bottom:26px}
+ .personal-studio .playground-card{order:2;margin:0 auto 24px}
+ .personal-studio .sticker-shelf-heading{order:3;margin:0 0 13px}
+ .personal-studio .sticker-tray{order:4;margin:0}
+ .personal-studio .personal-copy>p:not(.eyebrow){order:5;margin:22px 0 0}
+ .personal-studio .playground-intro{order:6;margin-top:18px}
+ .personal-studio .personal-copy>p.sticker-hint{order:7;margin-top:16px}
+ .closer-inner{padding-block:30px 26px;gap:20px}
+ .closer-copy h2{font-size:36px;letter-spacing:-1.7px;line-height:1.04}
+ .closer-download{gap:14px}
+ .closer-download .app-store-badge svg{width:150px;height:auto}
+ .closer-download>.text-link{font-size:10px}
+ .closer-star{width:70px;top:35px;right:7%}
+ .privacy-strip{padding-block:15px;gap:8px}
+ .site-footer .footer{padding-block:22px;gap:18px}
+ .footer-credit p,.footer-credit a{font-size:10px}
+}
