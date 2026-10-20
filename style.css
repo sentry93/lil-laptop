@@ -201,3 +201,24 @@ body.is-dragging-sticker,body.is-dragging-sticker *{cursor:grabbing!important}
  .site-footer .footer{padding-block:22px;gap:18px}
  .footer-credit p,.footer-credit a{font-size:10px}
 }
+
+/* Keep logo choices beside the object they change, above its lid. */
+.personal-studio .lid-mark-picker{margin:20px 0 8px}
+@media(max-width:600px){
+ .personal-studio .lid-mark-picker{margin:18px 0 6px}
+ .personal-studio .sticker-canvas{margin-top:12px}
+ .personal-studio .playground-card{margin-bottom:14px}
+ .enhanced .personal-studio .sticker-tray.has-more-left{--tray-left-fade:64px}
+ .enhanced .personal-studio .sticker-tray.has-more-right{--tray-right-fade:64px}
+ .personal-studio .playground-intro{order:5;margin:22px 0 0}
+ .personal-studio .personal-copy>p:not(.eyebrow){order:6;margin-top:16px}
+ .personal-studio .personal-copy>p.sticker-hint{display:none}
+ .closer .privacy-strip{display:none}
+ .closer-inner{flex-direction:row;align-items:center;gap:16px;padding-block:28px}
+ .closer-copy{flex:1;min-width:0}
+ .closer-copy h2{font-size:clamp(25px,7.4vw,31px);letter-spacing:-1.25px}
+ .closer-download{flex:0 0 120px;gap:12px}
+ .closer-download .app-store-badge svg{width:120px;height:auto}
+ .closer-download>.text-link{font-size:9px;gap:5px}
+ .closer-star{width:54px;top:12px;right:36%;opacity:.35}
+}
