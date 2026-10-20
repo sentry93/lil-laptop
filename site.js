@@ -1,4 +1,4 @@
-const models = [{"id":"powerbook170","name":"Power Notebook","description":"A trackball. Chunky keys. A very good beginning.","variants":[{"id":"graphite","name":"Graphite","color":"#62635D","front":"model-powerbook170-front.webp","back":"hero-power-rear.webp?v=20261019-campaign"}]},{"id":"ibook1999","name":"Jelly Clamshell","description":"A little colour goes a long way. Pick your flavour.","variants":[{"id":"blueberry","name":"Blueberry","color":"#00BDC3","front":"model-ibook1999-front.webp","back":"hero-blue-rear.webp?v=20261019-campaign"},{"id":"tangerine","name":"Tangerine","color":"#FF7A08","front":"model-ibook1999-tangerine-front.webp","back":"hero-orange-rear.webp?v=20261019-campaign"},{"id":"hotpink","name":"Hot Pink","color":"#FF159A","front":"model-ibook1999-hotpink-front.webp","back":"hero-pink-rear.webp?v=20261019-campaign"},{"id":"neongreen","name":"Neon Green","color":"#A8FF00","front":"model-ibook1999-neongreen-front.webp","back":"hero-green-rear.webp?v=20261019-campaign"}]},{"id":"titanium2001","name":"Aluminium Feather","description":"Cool metal. Dark keys. Turn-of-the-century energy.","variants":[{"id":"titanium","name":"Aluminium","color":"#B4B5B0","front":"model-titanium2001-front.webp","back":"hero-titanium-rear.webp?v=20261019-campaign"}]},{"id":"macbook2006","name":"Glossy Snow","description":"The little white laptop you never quite forgot.","variants":[{"id":"white","name":"White","color":"#F6F4EC","front":"model-macbook2006-front.webp","back":"hero-snow-rear.webp?v=20261019-campaign"}]},{"id":"unibody2008","name":"Alloy Pro","description":"Black glass, silver edges, and a place for your ideas.","variants":[{"id":"silver","name":"Silver","color":"#BBBEC0","front":"model-unibody2008-front.webp","back":"hero-alloy-rear.webp?v=20261019-campaign"}]},{"id":"pro2021","name":"Studio Pro","description":"A familiar modern desktop. A very personal little world.","variants":[{"id":"spacegray","name":"Space Gray","color":"#7D8084","front":"model-pro2021-front.webp","back":"hero-studio-rear.webp?v=20261019-campaign"},{"id":"silver","name":"Silver","color":"#BDC0C2","front":"model-pro2021-silver-front.webp","back":"model-pro2021-silver-lid.webp"}]}];
+const models = [{"id":"powerbook170","name":"Power Notebook","description":"A trackball. Chunky keys. A very good beginning.","variants":[{"id":"graphite","name":"Graphite","color":"#62635D","front":"model-powerbook170-front.webp?v=20261019-fan","back":"hero-power-rear.webp?v=20261019-brighter"}]},{"id":"ibook1999","name":"Jelly Clamshell","description":"A little colour goes a long way. Pick your flavour.","variants":[{"id":"blueberry","name":"Blueberry","color":"#00BDC3","front":"model-ibook1999-front.webp?v=20261019-fan","back":"hero-blue-rear.webp?v=20261019-brighter"},{"id":"tangerine","name":"Tangerine","color":"#FF7A08","front":"model-ibook1999-tangerine-front.webp?v=20261019-fan","back":"hero-orange-rear.webp?v=20261019-brighter"},{"id":"hotpink","name":"Hot Pink","color":"#FF159A","front":"model-ibook1999-hotpink-front.webp?v=20261019-fan","back":"hero-pink-rear.webp?v=20261019-brighter"},{"id":"neongreen","name":"Neon Green","color":"#A8FF00","front":"model-ibook1999-neongreen-front.webp?v=20261019-fan","back":"hero-green-rear.webp?v=20261019-brighter"}]},{"id":"titanium2001","name":"Aluminium Feather","description":"Cool metal. Dark keys. Turn-of-the-century energy.","variants":[{"id":"titanium","name":"Aluminium","color":"#B4B5B0","front":"model-titanium2001-front.webp?v=20261019-fan","back":"hero-titanium-rear.webp?v=20261019-brighter"}]},{"id":"macbook2006","name":"Glossy Snow","description":"The little white laptop you never quite forgot.","variants":[{"id":"white","name":"White","color":"#F6F4EC","front":"model-macbook2006-front.webp?v=20261019-fan","back":"hero-snow-rear.webp?v=20261019-brighter"}]},{"id":"unibody2008","name":"Alloy Pro","description":"Black glass, silver edges, and a place for your ideas.","variants":[{"id":"silver","name":"Silver","color":"#BBBEC0","front":"model-unibody2008-front.webp?v=20261019-fan","back":"hero-alloy-rear.webp?v=20261019-brighter"}]},{"id":"pro2021","name":"Studio Pro","description":"A familiar modern desktop. A very personal little world.","variants":[{"id":"spacegray","name":"Space Gray","color":"#7D8084","front":"model-pro2021-front.webp?v=20261019-fan","back":"hero-studio-rear.webp?v=20261019-brighter"},{"id":"silver","name":"Silver","color":"#BDC0C2","front":"model-pro2021-silver-front.webp?v=20261019-fan","back":"model-pro2021-silver-lid.webp"}]}];
 (() => {
   'use strict';
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -218,6 +218,40 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   window.addEventListener('resize',syncStickerEdges);
   requestAnimationFrame(syncStickerEdges);
 
+  const jellyCard=document.querySelector('.model-card[data-model="ibook1999"]');
+  const jellyStage=jellyCard.querySelector('.jelly-stage');
+  let jellyTop=1,jellyHover=false,jellyTimer=null,jellyZone=null;
+  function showJellyTop(index){
+    jellyTop=index;jellyCard.dataset.jellyTop=String(index);
+    jellyCard.querySelectorAll('.device-face img').forEach(image=>{
+      const top=image.classList.contains(`jelly-${index}`);
+      image.style.zIndex=top?'8':String(1+Number([...image.classList].find(name=>name.startsWith('jelly-')).slice(6)));
+      image.classList.toggle('is-jelly-top',top);
+    });
+  }
+  function scheduleJelly(){
+    clearTimeout(jellyTimer);jellyTimer=null;
+    if(!jellyHover||reduced.matches||document.hidden)return;
+    jellyTimer=setTimeout(()=>{showJellyTop((jellyTop+1)%4);scheduleJelly();},1100);
+  }
+  function chooseJellyAtPointer(event){
+    const bounds=jellyStage.getBoundingClientRect();
+    const zone=Math.max(0,Math.min(3,Math.floor((event.clientX-bounds.left)/bounds.width*4)));
+    if(zone===jellyZone)return;jellyZone=zone;showJellyTop(zone);scheduleJelly();
+  }
+  jellyStage.addEventListener('pointerenter',event=>{
+    if(event.pointerType!=='mouse')return;
+    jellyHover=true;jellyCard.classList.add('is-jelly-hover');chooseJellyAtPointer(event);scheduleJelly();
+  });
+  jellyStage.addEventListener('pointermove',event=>{if(jellyHover&&event.pointerType==='mouse')chooseJellyAtPointer(event);});
+  jellyStage.addEventListener('pointerleave',()=>{
+    jellyHover=false;jellyZone=null;clearTimeout(jellyTimer);jellyTimer=null;
+    jellyCard.classList.remove('is-jelly-hover');showJellyTop(1);
+  });
+  reduced.addEventListener('change',scheduleJelly);
+  document.addEventListener('visibilitychange',scheduleJelly);
+  showJellyTop(1);
+
   const heroArt = document.querySelector('.hero-art');
   const heroImage = document.querySelector('.hero-device');
   const heroSurface = document.querySelector('.render-surface');
@@ -229,7 +263,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     {id:'power',name:'Power Notebook / Graphite'},
     {id:'orange',name:'Jelly Clamshell / Tangerine'},
     {id:'studio',name:'Studio Pro / Space Gray'}
-  ].map(look=>({...look,open:`hero-${look.id}-open.webp?v=20261019-campaign`,rear:`hero-${look.id}-rear.webp?v=20261019-campaign`}));
+  ].map(look=>({...look,open:`hero-${look.id}-open.webp?v=20261019-brighter`,rear:`hero-${look.id}-rear.webp?v=20261019-brighter`}));
   const decorationChoices = ['bow','flower','circuit-club-02','circuit-club-03','circuit-club-06','circuit-club-07','circuit-club-08','wayfarer-01'];
   const deckLayouts = [[[0.81287,0.09586,-0.25604,0.50867,250.1585,768.7735]],[[0.55852,0.25561,-0.39233,0.34202,670.6905,858.1185]],[[0.70159,0.03635,-0.13683,0.42908,249.762,768.7285],[0.41294,0.18818,-0.35792,0.27111,280.249,790.0355]],[[0.46318,0.19566,-0.30162,0.28211,678.922,860.1115],[0.34567,0.0195,-0.02358,0.23038,647.8955,884.506]],[[0.81865,0.11538,-0.29242,0.51462,251.6885,767.5],[0.5282,0.26247,-0.40038,0.32608,672.609,858.5725]],[[0.57199,0.23563,-0.46255,0.36706,274.528,771.8655],[0.5997,0.04582,-0.05934,0.38532,652.982,865.443]]];
   const deckSlots=[...document.querySelectorAll('[data-deck-sticker]')];
@@ -274,7 +308,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   }
   const blocked = () => reduced.matches || document.hidden || heroHover || heroFocus || heroRear;
   const paused = () => blocked() || introActive;
-  function stopIntro(){introToken++;introActive=false;clearTimeout(introTimer);introTimer=null;if(introBounce){introBounce.cancel();introBounce=null;}heroButton.dataset.intro='complete';if(heroHasFrame)releaseIntroComplete();}
+  function stopIntro(){const wasCycling=introActive;introToken++;introActive=false;clearTimeout(introTimer);introTimer=null;if(introBounce){introBounce.cancel();introBounce=null;}if(wasCycling){lookIndex=0;heroRear=false;paintHero();}heroButton.dataset.intro='complete';if(heroHasFrame)releaseIntroComplete();}
   function bounceIntro(){
     if(reduced.matches)return;
     if(introBounce)introBounce.cancel();
@@ -304,6 +338,10 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
       });
     },700);
   }
+  function settleIntroOnSnow(){
+    lookIndex=0;heroRear=false;changeDeck();paintHero();bounceIntro();
+    introTimer=setTimeout(()=>{stopIntro();queueAlternateLooks();scheduleHero();},105);
+  }
   function startIntro(){
     if(blocked()){stopIntro();queueAlternateLooks();scheduleHero();return;}
     introActive=true;heroButton.dataset.intro='cycling';const token=++introToken;
@@ -316,10 +354,10 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
       const ready=pending.findIndex(index=>frontLoads.get(looks[index].id)?.ready);
       if(ready<0){
         if(pending.length){introTimer=setTimeout(next,30);return;}
-        stopIntro();queueAlternateLooks();changeDeck();scheduleHero();return;
+        settleIntroOnSnow();return;
       }
       lookIndex=pending.splice(ready,1)[0];paintHero();bounceIntro();
-      if(!pending.length){introTimer=setTimeout(()=>{stopIntro();queueAlternateLooks();changeDeck();scheduleHero();},105);return;}
+      if(!pending.length){introTimer=setTimeout(settleIntroOnSnow,105);return;}
       introTimer=setTimeout(next,110);
     };
     introTimer=setTimeout(next,110);
@@ -353,7 +391,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
         {translate:'0 0',scale:'1',opacity:1},
         {translate:'0 6px',scale:'1.015 .97',opacity:1,offset:.35},
         {translate:'0 -24px',scale:'.96 1.02',opacity:0}
-      ],{duration:spin?240:220,easing:'ease-in',fill:'forwards'});
+      ],{duration:spin?140:220,easing:'ease-in',fill:'forwards'});
       heroMotion=motion;await motion.finished;if(token!==transitionID)return;
       change();paintHero();await heroImage.decode().catch(()=>{});if(token!==transitionID)return;motion.cancel();
       motion=heroSurface.animate(spin?[
@@ -364,7 +402,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
         {translate:'0 7px',scale:'1.025 .98',opacity:1,offset:.5},
         {translate:'0 -3px',scale:'.995 1.005',opacity:1,offset:.8},
         {translate:'0 0',scale:'1',opacity:1}
-      ],{duration:spin?500:560,easing:'cubic-bezier(.2,.7,.25,1)',fill:'forwards'});
+      ],{duration:spin?260:560,easing:'cubic-bezier(.2,.7,.25,1)',fill:'forwards'});
       heroMotion=motion;await motion.finished;
     }catch(_){ /* Pointer exit and new deliberate clicks replace the current motion. */ }
     finally{if(motion)motion.cancel();if(token===transitionID){heroMotion=null;scheduleHero();}}
@@ -461,7 +499,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
       const item=entry.queue[index++];
       if(item.pause){entry.timer=setTimeout(next,item.pause);return;}
       item.typed.textContent+=item.character;
-      entry.timer=setTimeout(next,/[.,!?]/.test(item.character)?240:52);
+      entry.timer=setTimeout(next,/[.,!?]/.test(item.character)?240:46);
     }
     next();return true;
   }
