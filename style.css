@@ -228,3 +228,7 @@ body.is-dragging-sticker,body.is-dragging-sticker *{cursor:grabbing!important}
  .hero-art .hero-float{width:118%;margin-inline:-9%}
  .hero-art .render-surface{max-width:none}
 }
+
+/* Let desktop choices fill their column before wrapping. */
+.desktop-section .desktop-choices{width:100%;max-width:none}
+.desktop-section .desktop-choices button{flex:0 0 auto;white-space:nowrap}
