@@ -106,3 +106,7 @@ body.is-dragging-sticker,body.is-dragging-sticker *{cursor:grabbing!important}
 @media(max-width:600px){.footer-credit{gap:10px}.footer-credit .brand{font-size:20px}.footer-credit p{font-size:9px}}
 
 .hero-art-note{min-height:16px}.collection .device-back img{object-fit:contain}
+
+/* Keep the device area empty until the first Snow frame is ready. */
+.hero-art[data-loading=true]{visibility:hidden}
+.headline-run{display:inline-grid;vertical-align:baseline;max-width:100%}.headline-reserve,.headline-typed{grid-area:1/1}.headline-reserve{visibility:hidden}.headline-typed{min-width:0}
