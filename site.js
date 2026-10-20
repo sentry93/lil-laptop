@@ -1,97 +1,65 @@
-const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","description":"A trackball. Chunky keys. A very good beginning.","variants":[{"id":"graphite","name":"Graphite","color":"#62635D","front":"model-powerbook170-front.webp","back":"model-powerbook170-lid.webp"}]},{"id":"ibook1999","name":"Jelly Notebook","year":"1999","description":"A little colour goes a long way. Pick your flavour.","variants":[{"id":"blueberry","name":"Blueberry","color":"#00BDC3","front":"model-ibook1999-front.webp","back":"model-ibook1999-lid.webp"},{"id":"tangerine","name":"Tangerine","color":"#FF7A08","front":"model-ibook1999-tangerine-front.webp","back":"model-ibook1999-tangerine-lid.webp"},{"id":"hotpink","name":"Hot Pink","color":"#FF159A","front":"model-ibook1999-hotpink-front.webp","back":"model-ibook1999-hotpink-lid.webp"},{"id":"neongreen","name":"Neon Green","color":"#A8FF00","front":"model-ibook1999-neongreen-front.webp","back":"model-ibook1999-neongreen-lid.webp"}]},{"id":"titanium2001","name":"Titanium Notebook","year":"2001","description":"Cool metal. Dark keys. Turn-of-the-century energy.","variants":[{"id":"titanium","name":"Titanium","color":"#B4B5B0","front":"model-titanium2001-front.webp","back":"model-titanium2001-lid.webp"}]},{"id":"macbook2006","name":"Snow Notebook","year":"2006","description":"The little white laptop you never quite forgot.","variants":[{"id":"white","name":"White","color":"#F6F4EC","front":"model-macbook2006-front.webp","back":"model-macbook2006-lid.webp"}]},{"id":"unibody2008","name":"Alloy Pro","year":"2008","description":"Black glass, silver edges, and a place for your ideas.","variants":[{"id":"silver","name":"Silver","color":"#BBBEC0","front":"model-unibody2008-front.webp","back":"model-unibody2008-lid.webp"}]},{"id":"air2010","name":"Feather Notebook","year":"2010","description":"Light on its feet. Big on little possibilities.","variants":[{"id":"silver","name":"Silver","color":"#C2C6C7","front":"model-air2010-front.webp","back":"model-air2010-lid.webp"}]},{"id":"pro2021","name":"Studio Pro","year":"2021","description":"A familiar modern desktop. A very personal little world.","variants":[{"id":"spacegray","name":"Space Gray","color":"#7D8084","front":"model-pro2021-front.webp","back":"model-pro2021-lid.webp"},{"id":"silver","name":"Silver","color":"#BDC0C2","front":"model-pro2021-silver-front.webp","back":"model-pro2021-silver-lid.webp"}]}];
+const models = [{"id":"powerbook170","name":"Power Notebook","description":"A trackball. Chunky keys. A very good beginning.","variants":[{"id":"graphite","name":"Graphite","color":"#62635D","front":"model-powerbook170-front.webp","back":"model-powerbook170-lid.webp"}]},{"id":"ibook1999","name":"Jelly Notebook","description":"A little colour goes a long way. Pick your flavour.","variants":[{"id":"blueberry","name":"Blueberry","color":"#00BDC3","front":"model-ibook1999-front.webp","back":"model-ibook1999-lid.webp"},{"id":"tangerine","name":"Tangerine","color":"#FF7A08","front":"model-ibook1999-tangerine-front.webp","back":"model-ibook1999-tangerine-lid.webp"},{"id":"hotpink","name":"Hot Pink","color":"#FF159A","front":"model-ibook1999-hotpink-front.webp","back":"model-ibook1999-hotpink-lid.webp"},{"id":"neongreen","name":"Neon Green","color":"#A8FF00","front":"model-ibook1999-neongreen-front.webp","back":"model-ibook1999-neongreen-lid.webp"}]},{"id":"titanium2001","name":"Titanium Notebook","description":"Cool metal. Dark keys. Turn-of-the-century energy.","variants":[{"id":"titanium","name":"Titanium","color":"#B4B5B0","front":"model-titanium2001-front.webp","back":"model-titanium2001-lid.webp"}]},{"id":"macbook2006","name":"Snow Notebook","description":"The little white laptop you never quite forgot.","variants":[{"id":"white","name":"White","color":"#F6F4EC","front":"model-macbook2006-front.webp","back":"model-macbook2006-lid.webp"}]},{"id":"unibody2008","name":"Alloy Pro","description":"Black glass, silver edges, and a place for your ideas.","variants":[{"id":"silver","name":"Silver","color":"#BBBEC0","front":"model-unibody2008-front.webp","back":"model-unibody2008-lid.webp"}]},{"id":"pro2021","name":"Studio Pro","description":"A familiar modern desktop. A very personal little world.","variants":[{"id":"spacegray","name":"Space Gray","color":"#7D8084","front":"model-pro2021-front.webp","back":"model-pro2021-lid.webp"},{"id":"silver","name":"Silver","color":"#BDC0C2","front":"model-pro2021-silver-front.webp","back":"model-pro2021-silver-lid.webp"}]}];
 (() => {
   'use strict';
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  const copyOptions = {
-    hero: [
-      ['new laptop','who dis'], ['hello,','again.'], ['your phone.','your laptop.'],
-      ['hello,','colour.'], ['old soul.','new screen.'], ['little laptop.','big personality.']
-    ],
-    footer: [
-      ['hello,','again.'], ['new laptop','who dis'], ['your other','good side.'],
-      ['room for','your ideas.'], ['make it','personal.'], ['big lid','energy.']
-    ]
-  };
-  document.querySelectorAll('[data-copy-picker]').forEach(picker => {
-    const key=picker.dataset.copyPicker, choices=copyOptions[key];
-    const trigger=picker.querySelector('.copy-title'), menu=picker.querySelector('.copy-menu');
-    let selected=0;
-    try {const saved=Number(localStorage.getItem(`lil-laptop-copy-${key}`));if(Number.isInteger(saved)&&saved>=0&&saved<choices.length)selected=saved;}catch(_){}
-    function paintCopy() {
-      picker.querySelector('[data-copy-first]').textContent=choices[selected][0];
-      picker.querySelector('[data-copy-second]').textContent=choices[selected][1];
-      trigger.setAttribute('aria-label',`${choices[selected].join(' ')}. Choose ${key==='hero'?'homepage':'footer'} headline`);
-      menu.querySelectorAll('button').forEach((b,i)=>b.setAttribute('aria-checked',String(i===selected)));
-    }
-    function closeCopy(restore=false){menu.hidden=true;trigger.setAttribute('aria-expanded','false');if(restore)trigger.focus();}
-    function openCopy(){menu.hidden=false;trigger.setAttribute('aria-expanded','true');menu.querySelectorAll('button')[selected].focus();}
-    choices.forEach((lines,index)=>{
-      const option=document.createElement('button');option.type='button';option.setAttribute('role','menuitemradio');
-      option.textContent=lines.join(' / ');
-      option.addEventListener('click',()=>{selected=index;paintCopy();try{localStorage.setItem(`lil-laptop-copy-${key}`,String(index));}catch(_){}closeCopy(true);});
-      menu.append(option);
-    });
-    trigger.addEventListener('click',()=>{if(menu.hidden)openCopy();else closeCopy();});
-    trigger.addEventListener('keydown',event=>{if(['ArrowDown','ArrowUp'].includes(event.key)){event.preventDefault();openCopy();}});
-    menu.addEventListener('keydown',event=>{
-      const buttons=[...menu.querySelectorAll('button')],current=buttons.indexOf(document.activeElement);
-      if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){
-        event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?buttons.length-1:(current+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length;buttons[next].focus();
-      }else if(event.key==='Escape'){event.preventDefault();closeCopy(true);}
-      else if(event.key==='Tab')closeCopy();
-    });
-    document.addEventListener('click',event=>{if(!picker.contains(event.target))closeCopy();});
-    picker.addEventListener('focusout',event=>{if(!picker.contains(event.relatedTarget))closeCopy();});
-    paintCopy();
-  });
-
   const collection = document.querySelector('#collection');
   const sideButtons = [...collection.querySelectorAll('[data-side]')];
-  sideButtons.forEach(button => button.addEventListener('click', () => {
-    const back = button.dataset.side === 'back';
-    collection.classList.toggle('show-lids', back);
-    sideButtons.forEach(b => b.setAttribute('aria-pressed', String(b === button)));
-    document.querySelector('#collection-caption').textContent = back ? 'A little personality, all around.' : 'Pick your alter ego.';
-    document.querySelectorAll('.device-front').forEach(face => face.setAttribute('aria-hidden', String(back)));
-    document.querySelectorAll('.device-back').forEach(face => face.setAttribute('aria-hidden', String(!back)));
-  }));
-  const modelByID = new Map(models.map(model => [model.id, model]));
-  document.querySelectorAll('.swatch').forEach(button => button.addEventListener('click', () => {
-    const model = modelByID.get(button.dataset.model);
-    const variant = model.variants.find(v => v.id === button.dataset.variant);
-    const card = button.closest('.model-card');
-    card.querySelectorAll('.swatch').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
-    card.querySelector('.variant-name').textContent = variant.name;
-    const front = card.querySelector('.device-front img');
-    const back = card.querySelector('.device-back img');
-    front.src = variant.front;
-    back.src = variant.back;
-    front.alt = `${model.name} in ${variant.name}, open on iPhone Duo with its desktop and keyboard.`;
-    back.alt = `${model.name} back lid in ${variant.name}.`;
-    if (!reduced.matches) card.querySelector('.device-flipper').animate([
-      {scale:'1'}, {scale:'.96'}, {scale:'1'}
-    ], {duration:360, easing:'ease-out'});
-  }));
-
-  const desktopNames = {
-    system7:['Monochrome', '1991'], macos86:['Platinum', '1999'], aqua101:['Aqua', '2001'],
-    tiger104:['Brushed', '2005'], snow106:['Snow', '2009'], yosemite1010:['Flat', '2014'], sonoma14:['Modern', '2023']
-  };
-  const desktopImage = document.querySelector('#desktop-image');
-  document.querySelectorAll('[data-os]').forEach(button => button.addEventListener('click', () => {
-    const [name, year] = desktopNames[button.dataset.os];
-    document.querySelectorAll('[data-os]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
-    desktopImage.src = `desktop-${button.dataset.os}.webp`;
-    desktopImage.alt = `${name} desktop interface preview from lil laptop.`;
-    document.querySelector('#desktop-label').textContent = name;
-    if (!reduced.matches) desktopImage.animate([{opacity:.25},{opacity:1}], {duration:350,easing:'ease-out'});
-  }));
+  function showCollectionSide(back) {
+    collection.classList.toggle('show-lids',back);
+    sideButtons.forEach(button=>button.setAttribute('aria-pressed',String((button.dataset.side==='back')===back)));
+    document.querySelector('#collection-caption').textContent=back?'A little personality, all around.':'Pick your alter ego.';
+    collection.querySelectorAll('.device-front').forEach(face=>face.setAttribute('aria-hidden',String(back)));
+    collection.querySelectorAll('.device-back').forEach(face=>face.setAttribute('aria-hidden',String(!back)));
+    collection.querySelectorAll('.model-preview').forEach(button=>button.setAttribute('aria-label',`Flip ${button.closest('.model-card').querySelector('h3').textContent} and the collection to ${back?'open laptops':'lids'}`));
+  }
+  sideButtons.forEach(button=>button.addEventListener('click',()=>showCollectionSide(button.dataset.side==='back')));
+  collection.querySelectorAll('.model-preview').forEach(button=>button.addEventListener('click',()=>showCollectionSide(!collection.classList.contains('show-lids'))));
+  const desktopNames={system7:'Monochrome',macos86:'Platinum',aqua101:'Aqua',tiger104:'Brushed',snow106:'Snow',yosemite1010:'Flat',sonoma14:'Modern'};
+  const desktopImage=document.querySelector('#desktop-image');
+  function previewDesktop(button){
+    if(button.getAttribute('aria-pressed')==='true')return;
+    const name=desktopNames[button.dataset.os];
+    document.querySelectorAll('[data-os]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+    desktopImage.src=`desktop-${button.dataset.os}.webp`;desktopImage.alt=`${name} desktop interface preview from lil laptop.`;
+    document.querySelector('#desktop-label').textContent=name;
+    if(!reduced.matches)desktopImage.animate([{opacity:.35},{opacity:1}],{duration:240,easing:'ease-out'});
+  }
+  document.querySelectorAll('[data-os]').forEach(button=>{
+    button.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'||event.pointerType==='pen')previewDesktop(button);});
+    button.addEventListener('focus',()=>previewDesktop(button));
+    button.addEventListener('click',()=>previewDesktop(button));
+  });
 
   const canvas = document.querySelector('#sticker-canvas');
   const placed = document.querySelector('#placed-stickers');
   const status = document.querySelector('#playground-status');
   const stickerNames = {"bow": "Checked Bow", "flower": "Power Flower", "make-stuff": "Make Stuff", "open-late": "Open Late", "circuit-club-01": "Desktop Garden", "circuit-club-02": "Side A", "circuit-club-03": "Pocket Rangefinder", "circuit-club-04": "Patch Cable", "circuit-club-05": "Waveform Lab", "circuit-club-06": "Keycap Trio", "circuit-club-07": "Minute Keeper", "circuit-club-08": "Extra Life", "circuit-club-09": "Save Something", "circuit-club-10": "Human Inside", "circuit-club-11": "Orbital Relay", "wayfarer-01": "Lunar Moth", "wayfarer-02": "Quiet Heron", "wayfarer-03": "Fern Frond", "wayfarer-04": "Long Way Home", "wayfarer-05": "Forest Floor", "wayfarer-06": "Slow Traveller", "wayfarer-07": "Jewel Beetle", "wayfarer-08": "Silver Sardine", "wayfarer-09": "Ribbon Snake", "wayfarer-10": "Moon Study", "wayfarer-11": "Wild Stems", "wayfarer-12": "Elsewhere Map", "fruit-stand-01": "Late Lunch Tin", "fruit-stand-02": "Iced Matcha", "fruit-stand-03": "Blue Espresso", "fruit-stand-04": "Special Delivery", "fruit-stand-05": "Night Owl Matches", "fruit-stand-06": "Striped Vase", "fruit-stand-07": "Red Canvas", "fruit-stand-08": "Lucky Charms", "fruit-stand-10": "Good Eggs", "fruit-stand-11": "Day Dream Bottle", "fruit-stand-12": "One More Chapter", "type-and-play-02": "Soft Ware", "type-and-play-04": "Stay Curious", "type-and-play-05": "Slow Is A Speed", "type-and-play-06": "And Then Some", "type-and-play-07": "Less But Better", "type-and-play-08": "One More Page", "type-and-play-09": "Local Only", "type-and-play-10": "Side Quest", "type-and-play-11": "A Little Wonder", "type-and-play-12": "Good Enough"};
+  const lidLooks=[{"id":"powerbook170","jelly":false,"markColor":"#282C2D","name":"Power Notebook","src":"play-lid-powerbook170.webp","variant":"Graphite"},{"id":"ibook1999","jelly":true,"markColor":"#00ADB5","name":"Jelly Notebook","src":"play-lid-ibook1999.webp","variant":"Blueberry"},{"id":"ibook1999-tangerine","jelly":true,"markColor":"#FF7900","name":"Jelly Notebook","src":"play-lid-ibook1999-tangerine.webp","variant":"Tangerine"},{"id":"ibook1999-hotpink","jelly":true,"markColor":"#F20B89","name":"Jelly Notebook","src":"play-lid-ibook1999-hotpink.webp","variant":"Hot Pink"},{"id":"ibook1999-neongreen","jelly":true,"markColor":"#9CF000","name":"Jelly Notebook","src":"play-lid-ibook1999-neongreen.webp","variant":"Neon Green"},{"id":"titanium2001","jelly":false,"markColor":"#F2F4EF","name":"Titanium Notebook","src":"play-lid-titanium2001.webp","variant":"Titanium"},{"id":"macbook2006","jelly":false,"markColor":"#F2F4EF","name":"Snow Notebook","src":"play-lid-macbook2006.webp","variant":"White"},{"id":"unibody2008","jelly":false,"markColor":"#F2F4EF","name":"Alloy Pro","src":"play-lid-unibody2008.webp","variant":"Silver"},{"id":"pro2021","jelly":false,"markColor":"#282C2D","name":"Studio Pro","src":"play-lid-pro2021.webp","variant":"Space Gray"}];
+  const lidImage=document.querySelector('.playground-lid');
+  const lidButton=document.querySelector('#cycle-lid');
+  const lidMark=document.querySelector('.playground-mark');
+  let lidIndex=lidLooks.findIndex(lid=>lid.id==='pro2021'),mark='peach';
+  function paintLid(){
+    const lid=lidLooks[lidIndex];
+    lidImage.src=lid.src;lidImage.alt=`${lid.name} lid in ${lid.variant}, ready to decorate.`;
+    lidButton.setAttribute('aria-label',`Try the next laptop lid. Currently ${lid.name} in ${lid.variant}.`);
+    document.querySelector('#playground-lid-caption').textContent=`${lid.name} / ${lid.variant} · click the lid for another`;
+    canvas.dataset.jelly=String(lid.jelly);canvas.dataset.lid=lid.id;canvas.dataset.mark=mark;
+    canvas.style.setProperty('--mark-color',lid.markColor);
+    lidMark.style.visibility=mark==='none'?'hidden':'visible';
+    lidMark.querySelector('use').setAttribute('href',`#lid-mark-${mark}`);
+    document.querySelectorAll('.lid-mark-choices button[data-mark]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mark===mark)));
+  }
+  lidButton.addEventListener('click',()=>{
+    lidIndex=(lidIndex+1)%lidLooks.length;paintLid();
+    if(!reduced.matches)lidImage.animate([{opacity:.45,scale:'.97'},{opacity:1,scale:'1'}],{duration:280,easing:'ease-out'});
+    status.textContent=`${lidLooks[lidIndex].name} in ${lidLooks[lidIndex].variant}. Your stickers and chosen logo come with you.`;
+  });
+  document.querySelectorAll('.lid-mark-choices button[data-mark]').forEach(button=>button.addEventListener('click',()=>{mark=button.dataset.mark;paintLid();status.textContent=mark==='none'?'A clean lid, no logo.':`${button.title} logo selected.`;}));
+  lidLooks.forEach(lid=>{const image=new Image();image.src=lid.src;});
+  paintLid();
+
   const spots = [[.26,.36,-15],[.74,.59,12],[.35,.70,-8],[.68,.29,15],[.49,.45,-17],[.22,.57,7],[.73,.75,-6],[.55,.24,13]];
   let sequence = 0;
   let layer = 1;
@@ -166,20 +134,27 @@ const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","desc
     if (event.target !== gallery || !['ArrowLeft','ArrowRight'].includes(event.key)) return;
     event.preventDefault(); gallery.scrollBy({left:(event.key==='ArrowRight'?1:-1)*320,behavior:reduced.matches?'instant':'smooth'});
   });
-  const tray = document.querySelector('.sticker-tray');
-  document.querySelectorAll('[data-stickers-step]').forEach(button => button.addEventListener('click', () => {
-    tray.scrollBy({left:Number(button.dataset.stickersStep)*tray.clientWidth*.8,behavior:reduced.matches?'instant':'smooth'});
-  }));
-  // A mouse can pull the collection like a row of objects. Buttons keep their own click behaviour.
-  let shelfDrag = null;
-  gallery.addEventListener('pointerdown',event => {
-    if (event.pointerType !== 'mouse' || event.button !== 0 || event.target.closest('button,a')) return;
-    shelfDrag={x:event.clientX,left:gallery.scrollLeft}; gallery.setPointerCapture(event.pointerId);
+  const tray=document.querySelector('.sticker-tray');
+  tray.addEventListener('keydown',event=>{
+    if(event.target!==tray||!['ArrowLeft','ArrowRight'].includes(event.key))return;
+    event.preventDefault();tray.scrollBy({left:(event.key==='ArrowRight'?1:-1)*180,behavior:reduced.matches?'instant':'smooth'});
   });
-  gallery.addEventListener('pointermove',event => {
-    if (shelfDrag) gallery.scrollLeft=shelfDrag.left+shelfDrag.x-event.clientX;
-  });
-  ['pointerup','pointercancel','lostpointercapture'].forEach(type => gallery.addEventListener(type,()=>shelfDrag=null));
+  function dragShelf(track){
+    let drag=null,ignoreClick=false;
+    track.addEventListener('pointerdown',event=>{
+      if(event.pointerType!=='mouse'||event.button!==0)return;
+      drag={x:event.clientX,left:track.scrollLeft,id:event.pointerId,moved:false};
+    });
+    track.addEventListener('pointermove',event=>{
+      if(!drag)return;
+      if(!drag.moved&&Math.abs(event.clientX-drag.x)>6){drag.moved=true;ignoreClick=true;track.setPointerCapture(drag.id);}
+      if(drag.moved){event.preventDefault();track.scrollLeft=drag.left+drag.x-event.clientX;}
+    });
+    track.addEventListener('click',event=>{if(ignoreClick){event.preventDefault();event.stopImmediatePropagation();ignoreClick=false;}},true);
+    ['pointerup','pointercancel','lostpointercapture'].forEach(type=>track.addEventListener(type,()=>{drag=null;}));
+    track.addEventListener('pointerdown',()=>{ignoreClick=false;},true);
+  }
+  dragShelf(gallery);dragShelf(tray);
 
   const heroArt = document.querySelector('.hero-art');
   const heroImage = document.querySelector('.hero-device');
@@ -193,7 +168,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","year":"1991","desc
     {id:'snow',name:'Snow Notebook / White'},
     {id:'studio',name:'Studio Pro / Space Gray'}
   ].map(look=>({...look,open:`hero-${look.id}-open.webp`,rear:`hero-${look.id}-rear.webp`}));
-  const decorationChoices = Object.keys(stickerNames);
+  const decorationChoices = ['bow','flower','circuit-club-02','circuit-club-03','circuit-club-06','circuit-club-07','circuit-club-08','wayfarer-01'];
   const deckLayouts = [[[1.33257, 0.15715, -0.41974, 0.83388, 150.048, 747.356]], [[1.21418, 0.55567, -0.85289, 0.74353, 678.793, 857.279]], [[1.18913, 0.06161, -0.23191, 0.72726, 168.432, 723.095], [0.96033, 0.43762, -0.83238, 0.6305, 170.907, 787.325]], [[1.15795, 0.48914, -0.75404, 0.70528, 681.511, 838.569], [1.23453, 0.06965, -0.08422, 0.82279, 619.632, 942.954]], [[1.32041, 0.18609, -0.47164, 0.83003, 140.348, 750.682], [1.12384, 0.55845, -0.85187, 0.69379, 670.154, 881.828]], [[1.09999, 0.45313, -0.88951, 0.70588, 172.98, 743.15], [1.27596, 0.09748, -0.12626, 0.81982, 639.265, 860.14], [0.95171, 0.45132, -0.67307, 0.60288, 663.977, 934.311]]];
   const deckSlots=[...document.querySelectorAll('[data-deck-sticker]')];
   const cloudSlots=[...document.querySelectorAll('[data-cloud-sticker] img')];
