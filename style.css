@@ -110,3 +110,26 @@ body.is-dragging-sticker,body.is-dragging-sticker *{cursor:grabbing!important}
 /* Keep the device area empty until the first Snow frame is ready. */
 .hero-art[data-loading=true]{visibility:hidden}
 .headline-run{display:inline-grid;vertical-align:baseline;max-width:100%}.headline-reserve,.headline-typed{grid-area:1/1}.headline-reserve{visibility:hidden}.headline-typed{min-width:0}
+
+/* A six-object collection, with a compact orange-topped Jelly stack. */
+.collection .models-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:42px 28px;overflow:visible;margin:0;padding:38px 0 12px;scroll-snap-type:none;touch-action:auto;cursor:default}
+.collection .model-card,.collection .model-card[data-model=ibook1999]{width:100%;max-width:none;min-width:0;flex:auto;padding:10px 7px 15px}
+.collection .model-stage{height:285px;width:100%;margin:10px 0 5px;cursor:pointer;touch-action:pan-y}
+.collection .model-preview:active{cursor:pointer}
+.collection .model-card h3{font-size:23px}.collection .model-card>p{max-width:280px}
+.collection .jelly-stage .device-flipper{scale:1.1}
+.collection .jelly-stage .device-face img{width:96%;height:100%;top:0}
+.collection .jelly-stage .device-back img{height:100%;top:0}
+.collection .jelly-stage .jelly-0{left:-3%;transform:translateY(5px) rotate(-7deg);z-index:3}
+.collection .jelly-stage .jelly-1{left:0;transform:translateY(16px) rotate(-3deg);z-index:4}
+.collection .jelly-stage .jelly-2{left:3%;transform:translateY(-7px) rotate(0deg);z-index:2}
+.collection .jelly-stage .jelly-3{left:6%;transform:translateY(-18px) rotate(4deg);z-index:1}
+.collection .collection-note{text-align:center;margin-top:26px}
+/* Fade only the tray edges that still have stickers beyond them. */
+.enhanced .personal-studio .sticker-tray{--tray-left-fade:0px;--tray-right-fade:0px;mask-image:linear-gradient(to right,transparent 0,#000 var(--tray-left-fade),#000 calc(100% - var(--tray-right-fade)),transparent 100%);-webkit-mask-image:linear-gradient(to right,transparent 0,#000 var(--tray-left-fade),#000 calc(100% - var(--tray-right-fade)),transparent 100%)}
+.enhanced .personal-studio .sticker-tray.has-more-left{--tray-left-fade:28px}
+.enhanced .personal-studio .sticker-tray.has-more-right{--tray-right-fade:28px}
+@media(max-width:900px){.collection .models-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:35px 24px}.collection .model-stage{height:290px}}
+@media(max-width:560px){.collection .models-grid{grid-template-columns:1fr;gap:30px;padding-top:28px}.collection .model-card{max-width:390px;margin:auto}.collection .model-stage{height:310px}.collection .model-card h3{font-size:24px}.collection .model-card>p{max-width:320px}.collection .jelly-stage .device-flipper{scale:1.06}.collection .collection-note{text-align:left}}
+
+.collection .model-card[data-model=ibook1999] h3{margin-top:36px}

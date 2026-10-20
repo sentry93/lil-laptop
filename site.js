@@ -188,14 +188,6 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   });
   addSticker('bow',false); addSticker('make-stuff',false);
 
-  const gallery = document.querySelector('.models-grid');
-  document.querySelectorAll('[data-gallery-step]').forEach(button => button.addEventListener('click', () => {
-    gallery.scrollBy({left:Number(button.dataset.galleryStep)*(gallery.querySelector('.model-card').getBoundingClientRect().width+30), behavior:reduced.matches?'instant':'smooth'});
-  }));
-  gallery.addEventListener('keydown', event => {
-    if (event.target !== gallery || !['ArrowLeft','ArrowRight'].includes(event.key)) return;
-    event.preventDefault(); gallery.scrollBy({left:(event.key==='ArrowRight'?1:-1)*320,behavior:reduced.matches?'instant':'smooth'});
-  });
   const tray=document.querySelector('.sticker-tray');
   tray.addEventListener('keydown',event=>{
     if(event.target!==tray||!['ArrowLeft','ArrowRight'].includes(event.key))return;
@@ -216,7 +208,15 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     ['pointerup','pointercancel','lostpointercapture'].forEach(type=>track.addEventListener(type,()=>{drag=null;}));
     track.addEventListener('pointerdown',()=>{ignoreClick=false;},true);
   }
-  dragShelf(gallery);dragShelf(tray);
+  dragShelf(tray);
+  function syncStickerEdges(){
+    const remaining=tray.scrollWidth-tray.clientWidth-tray.scrollLeft;
+    tray.classList.toggle('has-more-left',tray.scrollLeft>2);
+    tray.classList.toggle('has-more-right',remaining>2);
+  }
+  tray.addEventListener('scroll',syncStickerEdges,{passive:true});
+  window.addEventListener('resize',syncStickerEdges);
+  requestAnimationFrame(syncStickerEdges);
 
   const heroArt = document.querySelector('.hero-art');
   const heroImage = document.querySelector('.hero-device');
@@ -235,7 +235,9 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   const deckSlots=[...document.querySelectorAll('[data-deck-sticker]')];
   const cloudSlots=[...document.querySelectorAll('[data-cloud-sticker] img')];
   let duoFinish='black';
-  let introActive=false,introTimer=null,introToken=0,introBounce=null;
+  let introActive=false,introTimer=null,introToken=0,introBounce=null,heroHasFrame=false;
+  let releaseIntroComplete;
+  const introComplete=new Promise(resolve=>{releaseIntroComplete=resolve;});
   let lookIndex=0, heroRear=false, lastDeckLayout=-1, lastCloudSlot=-1;
   let heroTimer=null, heroMotion=null, heroHover=false, heroFocus=false, transitionID=0;
   let cloudTimer=null;
@@ -272,7 +274,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   }
   const blocked = () => reduced.matches || document.hidden || heroHover || heroFocus || heroRear;
   const paused = () => blocked() || introActive;
-  function stopIntro(){introToken++;introActive=false;clearTimeout(introTimer);introTimer=null;if(introBounce){introBounce.cancel();introBounce=null;}heroButton.dataset.intro='complete';}
+  function stopIntro(){introToken++;introActive=false;clearTimeout(introTimer);introTimer=null;if(introBounce){introBounce.cancel();introBounce=null;}heroButton.dataset.intro='complete';if(heroHasFrame)releaseIntroComplete();}
   function bounceIntro(){
     if(reduced.matches)return;
     if(introBounce)introBounce.cancel();
@@ -404,7 +406,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   // Snow is the only image on the critical path; reveal and animate it as soon as it decodes.
   changeDeck();paintHero();
   heroImage.decode().catch(()=>{}).then(()=>{
-    heroArt.dataset.loading='false';primeFrontLooks();startIntro();scheduleCloud();
+    heroHasFrame=true;heroArt.dataset.loading='false';primeFrontLooks();startIntro();scheduleCloud();
   });
 
   const tilt = document.querySelector('.tilt');
@@ -425,8 +427,10 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     tilt.style.setProperty('--rx','0deg');tilt.style.setProperty('--ry','0deg');
   });
   const typedHeadlines=[];
+  let headlinesEnabled=false,headlineObserver=null;
   function prepareHeadline(heading){
     heading.setAttribute('aria-label',heading.innerText.replace(/\s+/g,' ').trim());
+    heading.dataset.typing='waiting';
     const runs=[];const queue=[];
     function visit(parent){
       [...parent.childNodes].forEach(node=>{
@@ -436,36 +440,45 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
           reserve.textContent=text;reserve.setAttribute('aria-hidden','true');typed.setAttribute('aria-hidden','true');
           run.append(reserve,typed);node.replaceWith(run);runs.push({typed,text});
           [...text].forEach(character=>queue.push({typed,character}));
-        }else if(node.nodeName==='BR'){queue.push({pause:125});}
+        }else if(node.nodeName==='BR'){queue.push({pause:180});}
         else if(node.nodeType===Node.ELEMENT_NODE)visit(node);
       });
     }
     visit(heading);
-    const entry={heading,runs,queue,timer:null,done:false};typedHeadlines.push(entry);return entry;
+    const entry={heading,runs,queue,timer:null,done:false,inView:false};typedHeadlines.push(entry);return entry;
   }
   function finishHeadline(entry){
-    clearTimeout(entry.timer);entry.runs.forEach(run=>{run.typed.textContent=run.text;});entry.done=true;
+    clearTimeout(entry.timer);entry.runs.forEach(run=>{run.typed.textContent=run.text;});entry.done=true;entry.heading.dataset.typing='complete';
   }
   function typeHeadline(entry){
-    if(entry.done)return;
-    if(reduced.matches){finishHeadline(entry);return;}
-    entry.done=true;let index=0;
+    if(entry.done)return true;
+    if(!headlinesEnabled&&!reduced.matches)return false;
+    if(reduced.matches){finishHeadline(entry);return true;}
+    entry.done=true;entry.heading.dataset.typing='typing';let index=0;
     function next(){
       if(reduced.matches){finishHeadline(entry);return;}
-      if(index>=entry.queue.length)return;
+      if(index>=entry.queue.length){entry.heading.dataset.typing='complete';return;}
       const item=entry.queue[index++];
       if(item.pause){entry.timer=setTimeout(next,item.pause);return;}
       item.typed.textContent+=item.character;
-      entry.timer=setTimeout(next,/[.,!?]/.test(item.character)?110:14);
+      entry.timer=setTimeout(next,/[.,!?]/.test(item.character)?240:52);
     }
-    next();
+    next();return true;
   }
   if(!reduced.matches&&'IntersectionObserver' in window){
     const entries=[...document.querySelectorAll('h1,h2')].map(prepareHeadline);
-    const headlineObserver=new IntersectionObserver(changes=>{
-      changes.forEach(change=>{if(change.isIntersecting){typeHeadline(entries.find(entry=>entry.heading===change.target));headlineObserver.unobserve(change.target);}});
-    },{threshold:.25});
+    headlineObserver=new IntersectionObserver(changes=>{
+      changes.forEach(change=>{
+        const entry=entries.find(entry=>entry.heading===change.target);entry.inView=change.isIntersecting&&change.intersectionRatio>=.8;
+        if(entry.inView&&typeHeadline(entry))headlineObserver.unobserve(change.target);
+      });
+    },{threshold:[0,.8],rootMargin:`-${header.offsetHeight+20}px 0px -${Math.round(window.innerHeight*.2)}px 0px`});
     entries.forEach(entry=>headlineObserver.observe(entry.heading));
+    // Let the laptop introduction land first, then reveal only comfortably visible headings.
+    introComplete.then(()=>setTimeout(()=>{
+      headlinesEnabled=true;
+      entries.forEach(entry=>{if(entry.inView&&typeHeadline(entry))headlineObserver.unobserve(entry.heading);});
+    },160));
     reduced.addEventListener('change',()=>{if(reduced.matches)typedHeadlines.forEach(finishHeadline);});
   }
 
@@ -473,7 +486,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   if ('IntersectionObserver' in window && !reduced.matches) {
     const observer = new IntersectionObserver(entries => entries.forEach(entry => {
       if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
-    }), {threshold:.06,rootMargin:'0px 0px 30px 0px'});
+    }), {threshold:.2,rootMargin:`0px 0px -${Math.round(window.innerHeight*.1)}px 0px`});
     document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
   } else document.querySelectorAll('.reveal').forEach(el=>el.classList.add('is-visible'));
   document.documentElement.classList.add('enhanced');
