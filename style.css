@@ -273,3 +273,12 @@ body.qr-modal-open{overflow:hidden}
 .collection.show-lids .device-front{visibility:hidden}
 .collection.show-lids .device-back{visibility:visible}
 @media(prefers-reduced-motion:reduce){.collection .device-face{transition:none}}
+
+/* Reserve room for the rotated Jelly fan so its mobile label stays below it. */
+@media(max-width:600px){
+ .collection .jelly-stage{margin-bottom:72px}
+ .collection .model-card[data-model=ibook1999] h3{position:relative;z-index:1}
+ .collection .jelly-stage .device-face img{scale:1}
+}
+.collection .is-jelly-dragging .device-flipper{animation-play-state:paused}
+.collection .is-jelly-dragging .is-jelly-top{translate:0 -6px}

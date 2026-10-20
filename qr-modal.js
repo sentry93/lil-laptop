@@ -51,34 +51,50 @@
     const scale = home.width / element.offsetWidth;
     const pose = (x, y, size, angle) => `translate(${x}px,${y}px) scale(${size}) rotate(${angle}deg)`;
     const isCode = element === qr;
+    // Reuse Source onboarding's sampled quadratic arc, then settle with a soft wobble.
+    const arcFrames = (from, to, endOffset, returning) => {
+      const vx=to.x-from.x,vy=to.y-from.y,distance=Math.hypot(vx,vy);
+      const bend=Math.min(320,distance*.9)*(isCode?1:-1)*(returning?-1:1);
+      const cx=(from.x+to.x)/2-vy/(distance||1)*bend;
+      const cy=(from.y+to.y)/2+vx/(distance||1)*bend;
+      return Array.from({length:33},(_,index)=>{
+        const t=index/32,u=1-t;
+        const x=u*u*from.x+2*u*t*cx+t*t*to.x;
+        const y=u*u*from.y+2*u*t*cy+t*t*to.y;
+        const size=from.scale+(to.scale-from.scale)*t;
+        const angle=from.angle+(to.angle-from.angle)*t-6*Math.sin(Math.PI*t);
+        return {offset:t*endOffset,transform:pose(x,y,size,angle)};
+      });
+    };
     let frames;
     if (direction === 'in') {
-      frames = [
-        { transform: pose(dx, dy, scale, home.angle), offset: 0 },
-        { transform: pose(-dx * .012, -dy * .012, 1.045, -3), offset: .62 },
-        { transform: pose(dx * .004, dy * .004, .99, 2), offset: .79 },
-        { transform: pose(0, -1, 1.008, -.7), offset: .91 },
-        { transform: 'none', offset: 1 }
-      ];
+      frames=arcFrames({x:dx,y:dy,scale,angle:home.angle},{x:0,y:0,scale:1.035,angle:-2.5},.76,false);
+      frames.push(
+        {transform:pose(0,2,.99,1.7),offset:.87},
+        {transform:pose(0,-1,1.005,-.55),offset:.95},
+        {transform:'none',offset:1}
+      );
       if (isCode) {
         frames[0].borderRadius = `${26 / scale}px`;
         frames[0].backgroundColor = '#f2ffd6';
-        frames[1].backgroundColor = '#dfff3f';
-        frames[4].backgroundColor = '#dfff3f';
-        frames[4].borderRadius = '40px';
+        frames[32].backgroundColor = '#dfff3f';
+        frames[frames.length-1].backgroundColor = '#dfff3f';
+        frames[frames.length-1].borderRadius = '40px';
       }
     } else {
-      frames = [
-        { transform: startTransform, offset: 0 },
-        { transform: pose(dx * 1.008, dy * 1.008, scale * .97, home.angle + 3), offset: .67 },
-        { transform: pose(dx * .997, dy * .997, scale * 1.015, home.angle - 1.2), offset: .86 },
-        { transform: pose(dx, dy, scale, home.angle), offset: 1 }
-      ];
+      // Capture the in-flight pose too, so an early dismissal has no position jump.
+      const matrix=new DOMMatrixReadOnly(startTransform);
+      const from={x:matrix.m41,y:matrix.m42,scale:Math.hypot(matrix.a,matrix.b),angle:Math.atan2(matrix.b,matrix.a)*180/Math.PI};
+      frames=arcFrames(from,{x:dx,y:dy,scale:scale*.98,angle:home.angle+2},.79,true);
+      frames.push(
+        {transform:pose(dx,dy,scale*1.01,home.angle-.8),offset:.92},
+        {transform:pose(dx,dy,scale,home.angle),offset:1}
+      );
       if (isCode) {
         frames[0].borderRadius = startRadius;
         frames[0].backgroundColor = startColor;
-        frames[3].borderRadius = `${26 / scale}px`;
-        frames[3].backgroundColor = '#f2ffd6';
+        frames[frames.length-1].borderRadius = `${26 / scale}px`;
+        frames[frames.length-1].backgroundColor = '#f2ffd6';
       }
     }
     return element.animate(frames, {

@@ -221,6 +221,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   const jellyCard=document.querySelector('.model-card[data-model="ibook1999"]');
   const jellyStage=jellyCard.querySelector('.jelly-stage');
   let jellyTop=1,jellyHover=false,jellyTimer=null,jellyZone=null;
+  let jellyGesture=null,suppressJellyClick=false;
   function showJellyTop(index){
     jellyTop=index;jellyCard.dataset.jellyTop=String(index);
     jellyCard.querySelectorAll('.device-face img').forEach(image=>{
@@ -240,14 +241,52 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     if(zone===jellyZone)return;jellyZone=zone;showJellyTop(zone);scheduleJelly();
   }
   jellyStage.addEventListener('pointerenter',event=>{
-    if(event.pointerType!=='mouse')return;
+    if(event.pointerType!=='mouse'||window.matchMedia('(max-width:600px)').matches)return;
     jellyHover=true;jellyCard.classList.add('is-jelly-hover');chooseJellyAtPointer(event);scheduleJelly();
   });
-  jellyStage.addEventListener('pointermove',event=>{if(jellyHover&&event.pointerType==='mouse')chooseJellyAtPointer(event);});
-  jellyStage.addEventListener('pointerleave',()=>{
+  jellyStage.addEventListener('pointermove',event=>{if(!jellyGesture&&jellyHover&&event.pointerType==='mouse')chooseJellyAtPointer(event);});
+  jellyStage.addEventListener('pointerleave',event=>{
+    if(event.pointerType!=='mouse'||jellyGesture||!jellyHover)return;
     jellyHover=false;jellyZone=null;clearTimeout(jellyTimer);jellyTimer=null;
     jellyCard.classList.remove('is-jelly-hover');showJellyTop(1);
   });
+  // Horizontal gestures change colour; vertical gestures remain page scrolling.
+  jellyStage.addEventListener('pointerdown',event=>{
+    if(event.isPrimary===false||(event.button!==undefined&&event.button!==0))return;
+    suppressJellyClick=false;
+    jellyGesture={id:event.pointerId,x:event.clientX,y:event.clientY,top:jellyTop,horizontal:false,vertical:false};
+  });
+  jellyStage.addEventListener('pointermove',event=>{
+    const gesture=jellyGesture;
+    if(!gesture||event.pointerId!==gesture.id||gesture.vertical)return;
+    const dx=event.clientX-gesture.x,dy=event.clientY-gesture.y;
+    if(!gesture.horizontal){
+      if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)*1.15){gesture.vertical=true;return;}
+      if(Math.abs(dx)<12||Math.abs(dx)<Math.abs(dy)*1.2)return;
+      gesture.horizontal=true;clearTimeout(jellyTimer);jellyTimer=null;
+      jellyCard.classList.add('is-jelly-dragging');
+      jellyStage.setPointerCapture(event.pointerId);
+    }
+    event.preventDefault();
+  });
+  function finishJellyGesture(event){
+    const gesture=jellyGesture;
+    if(!gesture||event.pointerId!==gesture.id)return;
+    if(gesture.horizontal){
+      suppressJellyClick=true;
+      const dx=event.clientX-gesture.x;
+      if(event.type==='pointerup'&&Math.abs(dx)>=32)
+        showJellyTop((gesture.top+(dx<0?1:3))%4);
+    }
+    jellyGesture=null;jellyCard.classList.remove('is-jelly-dragging');
+    scheduleJelly();
+  }
+  ['pointerup','pointercancel','lostpointercapture'].forEach(type=>jellyStage.addEventListener(type,finishJellyGesture));
+  jellyStage.addEventListener('keydown',()=>{suppressJellyClick=false;});
+  jellyStage.addEventListener('click',event=>{
+    if(!suppressJellyClick)return;
+    event.preventDefault();event.stopImmediatePropagation();suppressJellyClick=false;
+  },true);
   reduced.addEventListener('change',scheduleJelly);
   document.addEventListener('visibilitychange',scheduleJelly);
   showJellyTop(1);
