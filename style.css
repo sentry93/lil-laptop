@@ -145,3 +145,17 @@ body.is-dragging-sticker,body.is-dragging-sticker *{cursor:grabbing!important}
 .collection .is-jelly-hover .jelly-stage .is-jelly-top{translate:0 -9px}
 .collection .model-card[data-model=ibook1999] h3{margin-top:24px}
 @media(max-width:560px){.collection .jelly-stage .device-flipper{scale:1}}
+
+/* A gentle idle drift stays separate from the front/lid rotation. */
+.collection .device-flipper{animation:collection-float var(--float-time,6s) ease-in-out var(--float-delay,0s) infinite}
+.collection .model-card:nth-child(2){--float-time:6.6s;--float-delay:-2.2s}
+.collection .model-card:nth-child(3){--float-time:5.8s;--float-delay:-4s}
+.collection .model-card:nth-child(4){--float-time:6.8s;--float-delay:-1.5s}
+.collection .model-card:nth-child(5){--float-time:6.2s;--float-delay:-3.5s}
+.collection .model-card:nth-child(6){--float-time:6.5s;--float-delay:-.8s}
+.collection .model-card:hover .device-flipper,.collection .model-card:focus-within .device-flipper{animation-play-state:paused}
+@keyframes collection-float{0%,100%{translate:0 3px}50%{translate:0 -5px}}
+.collection .model-card>p{margin-bottom:5px}
+.collection .model-bottom{min-height:18px}
+.collection .device-back{padding:0;scale:1.25}
+@media(prefers-reduced-motion:reduce){.collection .device-flipper{animation:none}}
