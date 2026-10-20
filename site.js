@@ -512,10 +512,26 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
       });
     },{threshold:[0,.8],rootMargin:`-${header.offsetHeight+20}px 0px -${Math.round(window.innerHeight*.2)}px 0px`});
     entries.forEach(entry=>headlineObserver.observe(entry.heading));
+    // A compact final section cannot travel into the inset observer area.
+    // At the page end, allow headings that are fully inside the real viewport.
+    function revealBottomHeadlines(){
+      if(window.scrollY+window.innerHeight<document.documentElement.scrollHeight-2)return;
+      entries.forEach(entry=>{
+        if(entry.done)return;
+        const rect=entry.heading.getBoundingClientRect();
+        if(rect.top>=header.offsetHeight+20&&rect.bottom<=window.innerHeight-16){
+          entry.inView=true;
+          if(typeHeadline(entry))headlineObserver.unobserve(entry.heading);
+        }
+      });
+    }
+    window.addEventListener('scroll',revealBottomHeadlines,{passive:true});
+    window.addEventListener('resize',revealBottomHeadlines);
     // Let the laptop introduction land first, then reveal only comfortably visible headings.
     introComplete.then(()=>setTimeout(()=>{
       headlinesEnabled=true;
       entries.forEach(entry=>{if(entry.inView&&typeHeadline(entry))headlineObserver.unobserve(entry.heading);});
+      revealBottomHeadlines();
     },160));
     reduced.addEventListener('change',()=>{if(reduced.matches)typedHeadlines.forEach(finishHeadline);});
   }
