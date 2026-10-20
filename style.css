@@ -262,7 +262,14 @@ body.qr-modal-open{overflow:hidden}
 .qr-dialog .hero-qr{display:grid;width:100%;height:100%;padding:11.7647%;margin:0;border:0;border-radius:40px;background:var(--lime);transform:none;translate:none;transition:none;pointer-events:auto;cursor:default;box-shadow:0 24px 70px #0005}
 .qr-dialog .app-store-badge{display:block;width:100%;height:100%;pointer-events:auto;transform-origin:center}
 .qr-dialog .app-store-badge svg{display:block;width:100%;height:auto}
-.qr-modal-close{position:absolute;right:24px;top:24px;width:40px;height:40px;border-radius:50%;border:1px solid #f2ffd666;background:#f2ffd617;color:#f2ffd6;font-size:28px;line-height:1;display:grid;place-items:center}
-.qr-modal-close:hover{background:#f2ffd633}
 .qr-home-placeholder{visibility:hidden;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.qr-dialog::backdrop{transition:none}}
+
+/* Safari can paint the transformed Jelly children through a back-facing parent.
+   Hide the inactive face explicitly at the halfway point of the flip. */
+.collection .device-face{-webkit-backface-visibility:hidden;transition:translate .35s,visibility 0s .325s}
+.collection .device-front{visibility:visible}
+.collection .device-back{visibility:hidden}
+.collection.show-lids .device-front{visibility:hidden}
+.collection.show-lids .device-back{visibility:visible}
+@media(prefers-reduced-motion:reduce){.collection .device-face{transition:none}}

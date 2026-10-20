@@ -261,7 +261,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     {id:'snow',name:'Glossy Snow / White'},
     {id:'blue',name:'Jelly Clamshell / Blueberry'},
     {id:'power',name:'Power Notebook / Graphite'},
-    {id:'orange',name:'Jelly Clamshell / Tangerine'},
+    {id:'pink',name:'Jelly Clamshell / Hot Pink'},
     {id:'studio',name:'Studio Pro / Space Gray'}
   ].map(look=>({...look,open:`hero-${look.id}-open.webp?v=20261019-three-windows`,rear:`hero-${look.id}-rear.webp?v=20261019-brighter`}));
   const decorationChoices = ['bow','flower','circuit-club-02','circuit-club-03','circuit-club-06','circuit-club-07','circuit-club-08','wayfarer-01'];

@@ -55,9 +55,9 @@
     if (direction === 'in') {
       frames = [
         { transform: pose(dx, dy, scale, home.angle), offset: 0 },
-        { transform: pose(-dx * .045, -dy * .045, 1.13, -4), offset: .54 },
-        { transform: pose(dx * .018, dy * .018, .95, 2), offset: .74 },
-        { transform: pose(0, -3, 1.025, -.8), offset: .89 },
+        { transform: pose(-dx * .012, -dy * .012, 1.045, -3), offset: .62 },
+        { transform: pose(dx * .004, dy * .004, .99, 2), offset: .79 },
+        { transform: pose(0, -1, 1.008, -.7), offset: .91 },
         { transform: 'none', offset: 1 }
       ];
       if (isCode) {
@@ -70,8 +70,8 @@
     } else {
       frames = [
         { transform: startTransform, offset: 0 },
-        { transform: pose(dx * 1.025, dy * 1.025, scale * .9, home.angle + 4), offset: .64 },
-        { transform: pose(dx * .99, dy * .99, scale * 1.06, home.angle - 2), offset: .83 },
+        { transform: pose(dx * 1.008, dy * 1.008, scale * .97, home.angle + 3), offset: .67 },
+        { transform: pose(dx * .997, dy * .997, scale * 1.015, home.angle - 1.2), offset: .86 },
         { transform: pose(dx, dy, scale, home.angle), offset: 1 }
       ];
       if (isCode) {
@@ -83,7 +83,7 @@
     }
     return element.animate(frames, {
       duration: direction === 'in' ? (isCode ? 1000 : 1120) : (isCode ? 660 : 700),
-      easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'both'
+      easing: 'cubic-bezier(.25,.55,.3,1)', fill: 'both'
     });
   }
   async function openQR() {
@@ -124,7 +124,6 @@
     if (event.key === ' ') { event.preventDefault(); openQR(); }
   });
   dialog.addEventListener('click', event => { if (event.target === dialog) closeQR(); });
-  dialog.querySelector('.qr-modal-close').addEventListener('click', closeQR);
   dialog.addEventListener('cancel', event => { event.preventDefault(); closeQR(); });
   window.addEventListener('resize', () => {
     if (phase === 'closed') return;
