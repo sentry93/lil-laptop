@@ -2,3 +2,6 @@
 .x-video-backup{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#000;isolation:isolate}
 .x-video-backup iframe{position:absolute;top:0;left:0;display:block;width:550px;height:800px;max-width:none;border:0;transform-origin:top left;transform:scale(var(--x-video-scale,1)) translate(-16px,-110px)}
 .film-caption [hidden]{display:none!important}
+
+/* Keep a small white inset between the purple title bar and either player. */
+.video-frame>video,.video-frame>.x-video-backup{border-top:6px solid #fff;box-sizing:content-box}
