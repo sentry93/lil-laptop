@@ -229,7 +229,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     {id:'orange',name:'Jelly Notebook / Tangerine'},
     {id:'snow',name:'Snow Notebook / White'},
     {id:'studio',name:'Studio Pro / Space Gray'}
-  ].map(look=>({...look,open:`hero-${look.id}-open.webp`,rear:`hero-${look.id}-rear.webp`}));
+  ].map(look=>({...look,open:`hero-${look.id}-open.webp?v=20261019-seamless`,rear:`hero-${look.id}-rear.webp?v=20261019-seamless`}));
   const decorationChoices = ['bow','flower','circuit-club-02','circuit-club-03','circuit-club-06','circuit-club-07','circuit-club-08','wayfarer-01'];
   const deckLayouts = [[[1.33257, 0.15715, -0.41974, 0.83388, 150.048, 747.356]], [[1.21418, 0.55567, -0.85289, 0.74353, 678.793, 857.279]], [[1.18913, 0.06161, -0.23191, 0.72726, 168.432, 723.095], [0.96033, 0.43762, -0.83238, 0.6305, 170.907, 787.325]], [[1.15795, 0.48914, -0.75404, 0.70528, 681.511, 838.569], [1.23453, 0.06965, -0.08422, 0.82279, 619.632, 942.954]], [[1.32041, 0.18609, -0.47164, 0.83003, 140.348, 750.682], [1.12384, 0.55845, -0.85187, 0.69379, 670.154, 881.828]], [[1.09999, 0.45313, -0.88951, 0.70588, 172.98, 743.15], [1.27596, 0.09748, -0.12626, 0.81982, 639.265, 860.14], [0.95171, 0.45132, -0.67307, 0.60288, 663.977, 934.311]]];
   const deckSlots=[...document.querySelectorAll('[data-deck-sticker]')];
@@ -273,7 +273,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   const blocked = () => reduced.matches || document.hidden || heroHover || heroFocus || heroRear;
   const paused = () => blocked() || introActive;
   function stopIntro(){introToken++;introActive=false;clearTimeout(introTimer);introTimer=null;heroButton.dataset.intro='complete';}
-  function heroSource(look,rear){return duoFinish==='silver'?`hero-${look.id}-silver-${rear?'rear':'open'}.webp`:(rear?look.rear:look.open);}
+  function heroSource(look,rear){return duoFinish==='silver'?`hero-${look.id}-silver-${rear?'rear':'open'}.webp?v=20261019-seamless`:(rear?look.rear:look.open);}
   function startIntro(){
     if(blocked()){scheduleHero();return;}
     introActive=true;heroButton.dataset.intro='loading';const token=++introToken;
@@ -362,7 +362,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     looks.forEach(look=>[false,true].forEach(rear=>{const image=new Image();image.src=heroSource(look,rear);}));
   }));
   // Start loading the alternate finish without delaying the first complete device.
-  looks.forEach(look=>['open','rear'].forEach(side=>{const image=new Image();image.src=`hero-${look.id}-silver-${side}.webp`;}));
+  looks.forEach(look=>['open','rear'].forEach(side=>{const image=new Image();image.src=`hero-${look.id}-silver-${side}.webp?v=20261019-seamless`;}));
   changeDeck();paintHero();startIntro();scheduleCloud();
 
   const tilt = document.querySelector('.tilt');
