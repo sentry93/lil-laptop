@@ -11,7 +11,7 @@
   const iconSlot = dialog.querySelector('.qr-modal-icon-slot');
   const pieces = [qr, badge, icon];
   const homes = new Map();
-  let phase = 'closed', flights = [], ticket = 0, previousFocus = null;
+  let phase = 'closed', flights = [], ticket = 0, previousFocus = null, compactShadow = null;
   qr.setAttribute('role', 'button');
 
   function setPhase(value) { phase = value; dialog.dataset.state = value; }
@@ -36,6 +36,17 @@
       if (home) home.placeholder.replaceWith(element);
     });
     homes.clear();
+    if (!reduced.matches) {
+      // Carry the transparent return shadow into the compact card, then ease it in.
+      qr.style.transition = 'none';
+      const shadow = getComputedStyle(qr).boxShadow;
+      compactShadow?.cancel();
+      compactShadow = qr.animate([
+        { boxShadow: '0 0 0 0 rgba(0,0,0,0)' },
+        { boxShadow: shadow }
+      ], { duration: 300, easing: 'ease-out' });
+      qr.style.removeProperty('transition');
+    }
     dialog.classList.remove('is-visible');
     document.body.classList.remove('qr-modal-open');
     qr.setAttribute('aria-expanded', 'false');
@@ -102,6 +113,7 @@
   async function openQR() {
     if (phase !== 'closed') return;
     const ownTicket = ++ticket;
+    compactShadow?.cancel(); compactShadow = null;
     previousFocus = document.activeElement;
     pieces.forEach(rememberHome);
     setPhase('opening');
