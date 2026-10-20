@@ -232,3 +232,12 @@ body.is-dragging-sticker,body.is-dragging-sticker *{cursor:grabbing!important}
 /* Let desktop choices fill their column before wrapping. */
 .desktop-section .desktop-choices{width:100%;max-width:none}
 .desktop-section .desktop-choices button{flex:0 0 auto;white-space:nowrap}
+
+/* A counter-tilted QR card keeps a full quiet border around the code. */
+.hero-brand-pair{display:flex;align-items:center;width:max-content;margin-bottom:26px}
+.hero-brand-pair .hero-app-icon{margin:0}
+.hero-qr{position:relative;z-index:2;display:grid;place-items:center;width:90px;height:90px;padding:6px;margin-left:-5px;border-radius:14px;background:#fff;box-shadow:3px 6px 2px #14171f1c;transform:rotate(7deg);transition:translate .2s,box-shadow .2s}
+.hero-qr img{display:block;width:100%;height:100%;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.hero-qr:hover{translate:0 -3px;box-shadow:4px 9px 3px #14171f22}
+.hero-qr:focus-visible{outline:2px dashed var(--blue);outline-offset:5px}
+@media(max-width:600px){.hero-brand-pair{margin-bottom:23px}.hero-qr{display:none}}

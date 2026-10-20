@@ -369,7 +369,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     heroButton.dataset.side=heroRear?'back':'open';
     document.querySelector('#hero-interaction-hint').textContent=heroRear?'back lid':'front open';
     heroButton.setAttribute('aria-pressed',String(heroRear));
-    heroButton.setAttribute('aria-label',heroRear?`Spin to the front of ${look.name}`:`Spin to the back of ${look.name}`);
+    heroButton.setAttribute('aria-label',heroRear?`Explore the laptop collection from ${look.name}`:`Spin to the back of ${look.name}`);
   }
   function scheduleHero() {
     clearTimeout(heroTimer);heroTimer=null;heroArt.classList.toggle('is-paused',paused());
@@ -417,10 +417,18 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     stopIntro();heroButton.dataset.spinning='true';
     return moveHero(()=>{heroRear=rear;},true).finally(()=>{delete heroButton.dataset.spinning;scheduleHero();});
   }
+  function jumpToLaptopGrid(){
+    const grid=document.querySelector('.models-grid');
+    const controls=document.querySelector('.collection-controls');
+    const top=Math.max(0,controls.getBoundingClientRect().top+window.scrollY-header.offsetHeight-16);
+    grid.focus({preventScroll:true});
+    window.history.pushState(null,'','#collection');
+    window.scrollTo({top,behavior:reduced.matches?'instant':'smooth'});
+  }
   heroButton.addEventListener('click',event=>{
-    // Hover owns the mouse view; touch and keyboard keep a deliberate toggle.
-    if(event.pointerType==='mouse'&&heroHover)return;
-    showHeroSide(!heroRear);
+    if(heroRear||(event.pointerType==='mouse'&&heroHover)){jumpToLaptopGrid();return;}
+    // On touch and keyboard, the first activation still reveals the back lid.
+    showHeroSide(true);
   });
   heroArt.addEventListener('pointerenter',event=>{
     if(event.pointerType!=='mouse')return;
