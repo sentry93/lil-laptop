@@ -234,6 +234,8 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   const deckLayouts = [[[1.33257, 0.15715, -0.41974, 0.83388, 150.048, 747.356]], [[1.21418, 0.55567, -0.85289, 0.74353, 678.793, 857.279]], [[1.18913, 0.06161, -0.23191, 0.72726, 168.432, 723.095], [0.96033, 0.43762, -0.83238, 0.6305, 170.907, 787.325]], [[1.15795, 0.48914, -0.75404, 0.70528, 681.511, 838.569], [1.23453, 0.06965, -0.08422, 0.82279, 619.632, 942.954]], [[1.32041, 0.18609, -0.47164, 0.83003, 140.348, 750.682], [1.12384, 0.55845, -0.85187, 0.69379, 670.154, 881.828]], [[1.09999, 0.45313, -0.88951, 0.70588, 172.98, 743.15], [1.27596, 0.09748, -0.12626, 0.81982, 639.265, 860.14], [0.95171, 0.45132, -0.67307, 0.60288, 663.977, 934.311]]];
   const deckSlots=[...document.querySelectorAll('[data-deck-sticker]')];
   const cloudSlots=[...document.querySelectorAll('[data-cloud-sticker] img')];
+  let duoFinish='black';
+  let introActive=false,introTimer=null,introToken=0;
   let lookIndex=0, heroRear=false, lastDeckLayout=-1, lastCloudSlot=-1;
   let heroTimer=null, heroMotion=null, heroHover=false, heroFocus=false, transitionID=0;
   let cloudTimer=null;
@@ -268,18 +270,38 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     image.animate([{opacity:0,scale:'.65',rotate:'12deg'},{opacity:1,scale:'1.12',rotate:'-3deg',offset:.65},{opacity:1,scale:'1',rotate:'0deg'}],{duration:380,easing:'ease-out'});
     scheduleCloud();
   }
-  const paused = () => reduced.matches || document.hidden || heroHover || heroFocus || heroRear;
+  const blocked = () => reduced.matches || document.hidden || heroHover || heroFocus || heroRear;
+  const paused = () => blocked() || introActive;
+  function stopIntro(){introToken++;introActive=false;clearTimeout(introTimer);introTimer=null;heroButton.dataset.intro='complete';}
+  function heroSource(look,rear){return duoFinish==='silver'?`hero-${look.id}-silver-${rear?'rear':'open'}.webp`:(rear?look.rear:look.open);}
+  function startIntro(){
+    if(blocked()){scheduleHero();return;}
+    introActive=true;heroButton.dataset.intro='loading';const token=++introToken;
+    Promise.allSettled(looks.map(look=>{const image=new Image();image.src=heroSource(look,false);return image.decode();})).then(()=>{
+      if(token!==introToken)return;
+      if(blocked()){stopIntro();scheduleHero();return;}
+      heroButton.dataset.intro='cycling';let step=0;
+      const next=()=>{
+        if(token!==introToken)return;
+        if(blocked()){stopIntro();scheduleHero();return;}
+        lookIndex=(++step)%looks.length;paintHero();
+        if(step===looks.length){stopIntro();changeDeck();scheduleHero();return;}
+        introTimer=setTimeout(next,150);
+      };
+      introTimer=setTimeout(next,150);
+    });
+  }
   function paintHero() {
-    const look=looks[lookIndex];heroImage.src=heroRear?look.rear:look.open;
-    heroImage.alt=heroRear?`${look.name}, partly open with its back lid facing you on iPhone Duo.`:`${look.name} on iPhone Duo in the angled open pose, with stickers around its trackpad.`;
-    heroLabel.textContent=look.name;heroButton.dataset.look=look.id;
+    const look=looks[lookIndex];heroImage.src=heroSource(look,heroRear);
+    heroImage.alt=heroRear?`${look.name}, partly open with its back lid facing you on ${duoFinish} iPhone Duo.`:`${look.name} on ${duoFinish} iPhone Duo in the angled open pose, with stickers around its trackpad.`;
+    heroLabel.textContent=look.name;heroButton.dataset.look=look.id;heroButton.dataset.finish=duoFinish;
     heroButton.dataset.side=heroRear?'back':'open';
     heroButton.setAttribute('aria-pressed',String(heroRear));
     heroButton.setAttribute('aria-label',heroRear?`Spin to the front of ${look.name}`:`Spin to the back of ${look.name}`);
   }
   function scheduleHero() {
     clearTimeout(heroTimer);heroTimer=null;heroArt.classList.toggle('is-paused',paused());
-    if(!paused()&&!heroMotion)heroTimer=setTimeout(cycleHero,3600);
+    if(!paused()&&!heroMotion)heroTimer=setTimeout(cycleHero,2400);
   }
   function cancelHeroMotion() {
     transitionID++;if(heroMotion){heroMotion.cancel();heroMotion=null;}
@@ -315,11 +337,13 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   }
   function cycleHero(){heroTimer=null;if(!paused())moveHero(()=>{lookIndex=(lookIndex+1)%looks.length;changeDeck();});}
   function syncHero(){
+    if(introActive)stopIntro();
     // Hover always holds a complete render, never a half-faded bounce frame.
     if(heroMotion&&!heroButton.dataset.spinning){cancelHeroMotion();paintHero();}
     scheduleHero();
   }
   heroButton.addEventListener('click',()=>{
+    stopIntro();
     const next=!heroRear;heroButton.dataset.spinning='true';
     moveHero(()=>{heroRear=next;},true).finally(()=>{delete heroButton.dataset.spinning;scheduleHero();});
   });
@@ -327,10 +351,19 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   heroArt.addEventListener('pointerleave',()=>{heroHover=false;delete heroButton.dataset.spinning;cancelHeroMotion();heroRear=false;paintHero();scheduleHero();});
   heroButton.addEventListener('focusin',()=>{heroFocus=heroButton.matches(':focus-visible');syncHero();});
   heroButton.addEventListener('focusout',()=>{heroFocus=false;heroRear=false;cancelHeroMotion();paintHero();scheduleHero();});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelHeroMotion();heroRear=false;paintHero();}scheduleHero();scheduleCloud();});
-  reduced.addEventListener('change',()=>{cancelHeroMotion();heroRear=false;paintHero();scheduleHero();scheduleCloud();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){stopIntro();cancelHeroMotion();heroRear=false;paintHero();}scheduleHero();scheduleCloud();});
+  reduced.addEventListener('change',()=>{stopIntro();cancelHeroMotion();heroRear=false;paintHero();scheduleHero();scheduleCloud();});
   looks.forEach(look=>[look.open,look.rear].forEach(src=>{const image=new Image();image.src=src;}));
-  changeDeck();paintHero();scheduleHero();scheduleCloud();
+  document.querySelectorAll('[data-duo-finish]').forEach(button=>button.addEventListener('click',()=>{
+    if(duoFinish===button.dataset.duoFinish)return;
+    stopIntro();cancelHeroMotion();duoFinish=button.dataset.duoFinish;
+    document.querySelectorAll('[data-duo-finish]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+    paintHero();scheduleHero();
+    looks.forEach(look=>[false,true].forEach(rear=>{const image=new Image();image.src=heroSource(look,rear);}));
+  }));
+  // Start loading the alternate finish without delaying the first complete device.
+  looks.forEach(look=>['open','rear'].forEach(side=>{const image=new Image();image.src=`hero-${look.id}-silver-${side}.webp`;}));
+  changeDeck();paintHero();startIntro();scheduleCloud();
 
   const tilt = document.querySelector('.tilt');
   let frame = null;
