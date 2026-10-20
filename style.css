@@ -235,9 +235,17 @@ body.is-dragging-sticker,body.is-dragging-sticker *{cursor:grabbing!important}
 
 /* A counter-tilted QR card keeps a full quiet border around the code. */
 .hero-brand-pair{display:flex;align-items:center;width:max-content;margin-bottom:26px}
-.hero-brand-pair .hero-app-icon{margin:0}
-.hero-qr{position:relative;z-index:2;display:grid;place-items:center;width:90px;height:90px;padding:6px;margin-left:-5px;border-radius:14px;background:#fff;box-shadow:3px 6px 2px #14171f1c;transform:rotate(7deg);transition:translate .2s,box-shadow .2s}
+.hero-brand-pair .hero-app-icon{margin:0;position:relative;z-index:3}
+.hero-qr{position:relative;z-index:1;display:grid;place-items:center;width:102px;height:102px;padding:12px;margin-left:-3px;border-radius:16px;background:#fff;box-shadow:3px 6px 2px #14171f1c;transform:rotate(7deg);transition:translate .2s,box-shadow .2s}
 .hero-qr img{display:block;width:100%;height:100%;pointer-events:none;user-select:none;-webkit-user-drag:none}
 .hero-qr:hover{translate:0 -3px;box-shadow:4px 9px 3px #14171f22}
 .hero-qr:focus-visible{outline:2px dashed var(--blue);outline-offset:5px}
 @media(max-width:600px){.hero-brand-pair{margin-bottom:23px}.hero-qr{display:none}}
+
+/* Keep the mobile opening composition compact and its labels close to the device. */
+@media(max-width:600px){
+ .hero-grid{gap:12px}
+ .hero-brand-pair{margin-bottom:14px}
+ .hero-render-caption{margin-top:-8px;min-height:12px;line-height:1.25}
+ .hero-art-note{margin-top:0;line-height:1.25}
+}

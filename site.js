@@ -522,7 +522,15 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     entries.forEach(entry=>headlineObserver.observe(entry.heading));
     // A compact final section cannot travel into the inset observer area.
     // At the page end, allow headings that are fully inside the real viewport.
-    function revealBottomHeadlines(){
+    function revealViewportEdgeHeadlines(){
+      // The mobile opening headline starts whenever it is actually on screen.
+      // It must not depend on a first scroll into the deeper section threshold.
+      const heroEntry=entries.find(entry=>entry.heading.nodeName==='H1');
+      if(window.innerWidth<=600&&heroEntry&&!heroEntry.done){
+        const rect=heroEntry.heading.getBoundingClientRect();
+        heroEntry.inView=rect.top<window.innerHeight&&rect.bottom>header.offsetHeight;
+        if(heroEntry.inView&&typeHeadline(heroEntry))headlineObserver.unobserve(heroEntry.heading);
+      }
       if(window.scrollY+window.innerHeight<document.documentElement.scrollHeight-2)return;
       entries.forEach(entry=>{
         if(entry.done)return;
@@ -533,13 +541,13 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
         }
       });
     }
-    window.addEventListener('scroll',revealBottomHeadlines,{passive:true});
-    window.addEventListener('resize',revealBottomHeadlines);
+    window.addEventListener('scroll',revealViewportEdgeHeadlines,{passive:true});
+    window.addEventListener('resize',revealViewportEdgeHeadlines);
     // Let the laptop introduction land first, then reveal only comfortably visible headings.
     introComplete.then(()=>setTimeout(()=>{
       headlinesEnabled=true;
       entries.forEach(entry=>{if(entry.inView&&typeHeadline(entry))headlineObserver.unobserve(entry.heading);});
-      revealBottomHeadlines();
+      revealViewportEdgeHeadlines();
     },160));
     reduced.addEventListener('change',()=>{if(reduced.matches)typedHeadlines.forEach(finishHeadline);});
   }
