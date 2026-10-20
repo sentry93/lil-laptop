@@ -1,4 +1,4 @@
-const models = [{"id":"powerbook170","name":"Power Notebook","description":"A trackball. Chunky keys. A very good beginning.","variants":[{"id":"graphite","name":"Graphite","color":"#62635D","front":"model-powerbook170-front.webp?v=20261019-fan","back":"hero-power-rear.webp?v=20261019-brighter"}]},{"id":"ibook1999","name":"Jelly Clamshell","description":"A little colour goes a long way. Pick your flavour.","variants":[{"id":"blueberry","name":"Blueberry","color":"#00BDC3","front":"model-ibook1999-front.webp?v=20261019-fan","back":"hero-blue-rear.webp?v=20261019-brighter"},{"id":"tangerine","name":"Tangerine","color":"#FF7A08","front":"model-ibook1999-tangerine-front.webp?v=20261019-fan","back":"hero-orange-rear.webp?v=20261019-brighter"},{"id":"hotpink","name":"Hot Pink","color":"#FF159A","front":"model-ibook1999-hotpink-front.webp?v=20261019-fan","back":"hero-pink-rear.webp?v=20261019-brighter"},{"id":"neongreen","name":"Neon Green","color":"#A8FF00","front":"model-ibook1999-neongreen-front.webp?v=20261019-fan","back":"hero-green-rear.webp?v=20261019-brighter"}]},{"id":"titanium2001","name":"Aluminium Feather","description":"Cool metal. Dark keys. Turn-of-the-century energy.","variants":[{"id":"titanium","name":"Aluminium","color":"#B4B5B0","front":"model-titanium2001-front.webp?v=20261019-fan","back":"hero-titanium-rear.webp?v=20261019-brighter"}]},{"id":"macbook2006","name":"Glossy Snow","description":"The little white laptop you never quite forgot.","variants":[{"id":"white","name":"White","color":"#F6F4EC","front":"model-macbook2006-front.webp?v=20261019-fan","back":"hero-snow-rear.webp?v=20261019-brighter"}]},{"id":"unibody2008","name":"Alloy Pro","description":"Black glass, silver edges, and a place for your ideas.","variants":[{"id":"silver","name":"Silver","color":"#BBBEC0","front":"model-unibody2008-front.webp?v=20261019-fan","back":"hero-alloy-rear.webp?v=20261019-brighter"}]},{"id":"pro2021","name":"Studio Pro","description":"A familiar modern desktop. A very personal little world.","variants":[{"id":"spacegray","name":"Space Gray","color":"#7D8084","front":"model-pro2021-front.webp?v=20261019-fan","back":"hero-studio-rear.webp?v=20261019-brighter"},{"id":"silver","name":"Silver","color":"#BDC0C2","front":"model-pro2021-silver-front.webp?v=20261019-fan","back":"model-pro2021-silver-lid.webp"}]}];
+const models = [{"id":"powerbook170","name":"Power Notebook","description":"A trackball. Chunky keys. A very good beginning.","variants":[{"id":"graphite","name":"Graphite","color":"#62635D","front":"model-powerbook170-front.webp?v=20261019-three-windows","back":"hero-power-rear.webp?v=20261019-brighter"}]},{"id":"ibook1999","name":"Jelly Clamshell","description":"A little colour goes a long way. Pick your flavour.","variants":[{"id":"blueberry","name":"Blueberry","color":"#00BDC3","front":"model-ibook1999-front.webp?v=20261019-three-windows","back":"hero-blue-rear.webp?v=20261019-brighter"},{"id":"tangerine","name":"Tangerine","color":"#FF7A08","front":"model-ibook1999-tangerine-front.webp?v=20261019-three-windows","back":"hero-orange-rear.webp?v=20261019-brighter"},{"id":"hotpink","name":"Hot Pink","color":"#FF159A","front":"model-ibook1999-hotpink-front.webp?v=20261019-three-windows","back":"hero-pink-rear.webp?v=20261019-brighter"},{"id":"neongreen","name":"Neon Green","color":"#A8FF00","front":"model-ibook1999-neongreen-front.webp?v=20261019-three-windows","back":"hero-green-rear.webp?v=20261019-brighter"}]},{"id":"titanium2001","name":"Aluminium Feather","description":"Cool metal. Dark keys. Turn-of-the-century energy.","variants":[{"id":"titanium","name":"Aluminium","color":"#B4B5B0","front":"model-titanium2001-front.webp?v=20261019-three-windows","back":"hero-titanium-rear.webp?v=20261019-brighter"}]},{"id":"macbook2006","name":"Glossy Snow","description":"The little white laptop you never quite forgot.","variants":[{"id":"white","name":"White","color":"#F6F4EC","front":"model-macbook2006-front.webp?v=20261019-three-windows","back":"hero-snow-rear.webp?v=20261019-brighter"}]},{"id":"unibody2008","name":"Alloy Pro","description":"Black glass, silver edges, and a place for your ideas.","variants":[{"id":"silver","name":"Silver","color":"#BBBEC0","front":"model-unibody2008-front.webp?v=20261019-three-windows","back":"hero-alloy-rear.webp?v=20261019-brighter"}]},{"id":"pro2021","name":"Studio Pro","description":"A familiar modern desktop. A very personal little world.","variants":[{"id":"spacegray","name":"Space Gray","color":"#7D8084","front":"model-pro2021-front.webp?v=20261019-three-windows","back":"hero-studio-rear.webp?v=20261019-brighter"},{"id":"silver","name":"Silver","color":"#BDC0C2","front":"model-pro2021-silver-front.webp?v=20261019-three-windows","back":"model-pro2021-silver-lid.webp"}]}];
 (() => {
   'use strict';
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -33,7 +33,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     if(button.getAttribute('aria-pressed')==='true')return;
     const name=desktopNames[button.dataset.os];
     document.querySelectorAll('[data-os]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
-    desktopImage.src=`desktop-${button.dataset.os}.webp`;desktopImage.alt=`${name} desktop interface preview from lil laptop.`;
+    desktopImage.src=`desktop-${button.dataset.os}.webp?v=20261019-three-windows`;desktopImage.alt=`${name} desktop with Finder, Paint and Notes windows open.`;
     document.querySelector('#desktop-label').textContent=name;
     if(!reduced.matches)desktopImage.animate([{opacity:.35},{opacity:1}],{duration:240,easing:'ease-out'});
   }
@@ -263,7 +263,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     {id:'power',name:'Power Notebook / Graphite'},
     {id:'orange',name:'Jelly Clamshell / Tangerine'},
     {id:'studio',name:'Studio Pro / Space Gray'}
-  ].map(look=>({...look,open:`hero-${look.id}-open.webp?v=20261019-brighter`,rear:`hero-${look.id}-rear.webp?v=20261019-brighter`}));
+  ].map(look=>({...look,open:`hero-${look.id}-open.webp?v=20261019-three-windows`,rear:`hero-${look.id}-rear.webp?v=20261019-brighter`}));
   const decorationChoices = ['bow','flower','circuit-club-02','circuit-club-03','circuit-club-06','circuit-club-07','circuit-club-08','wayfarer-01'];
   const deckLayouts = [[[0.81287,0.09586,-0.25604,0.50867,250.1585,768.7735]],[[0.55852,0.25561,-0.39233,0.34202,670.6905,858.1185]],[[0.70159,0.03635,-0.13683,0.42908,249.762,768.7285],[0.41294,0.18818,-0.35792,0.27111,280.249,790.0355]],[[0.46318,0.19566,-0.30162,0.28211,678.922,860.1115],[0.34567,0.0195,-0.02358,0.23038,647.8955,884.506]],[[0.81865,0.11538,-0.29242,0.51462,251.6885,767.5],[0.5282,0.26247,-0.40038,0.32608,672.609,858.5725]],[[0.57199,0.23563,-0.46255,0.36706,274.528,771.8655],[0.5997,0.04582,-0.05934,0.38532,652.982,865.443]]];
   const deckSlots=[...document.querySelectorAll('[data-deck-sticker]')];
@@ -318,7 +318,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
       {scale:'1',translate:'0 0'}
     ],{duration:105,easing:'cubic-bezier(.2,.8,.3,1)'});
   }
-  function heroSource(look,rear){return duoFinish==='silver'?`hero-${look.id}-silver-${rear?'rear':'open'}.webp?v=20261019-campaign`:(rear?look.rear:look.open);}
+  function heroSource(look,rear){return duoFinish==='silver'?`hero-${look.id}-silver-${rear?'rear':'open'}.webp?v=20261019-three-windows`:(rear?look.rear:look.open);}
   const frontLoads=new Map();
   let alternateLoadsQueued=false;
   function primeFrontLooks(){
@@ -334,7 +334,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     setTimeout(()=>{
       looks.forEach(look=>{
         const rear=new Image();rear.fetchPriority='low';rear.src=heroSource(look,true);
-        ['open','rear'].forEach(side=>{const image=new Image();image.fetchPriority='low';image.src=`hero-${look.id}-silver-${side}.webp?v=20261019-campaign`;});
+        ['open','rear'].forEach(side=>{const image=new Image();image.fetchPriority='low';image.src=`hero-${look.id}-silver-${side}.webp?v=20261019-three-windows`;});
       });
     },700);
   }
