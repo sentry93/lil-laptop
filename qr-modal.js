@@ -1,13 +1,15 @@
 (() => {
   'use strict';
   const qr = document.querySelector('.hero-qr');
+  const icon = document.querySelector('.hero-brand-pair .hero-app-icon');
   const badge = document.querySelector('.site-header .app-store-badge');
   const dialog = document.querySelector('#qr-dialog');
-  if (!qr || !badge || !dialog) return;
+  if (!qr || !badge || !icon || !dialog) return;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const codeSlot = dialog.querySelector('.qr-modal-code-slot');
   const badgeSlot = dialog.querySelector('.qr-modal-badge-slot');
-  const pieces = [qr, badge];
+  const iconSlot = dialog.querySelector('.qr-modal-icon-slot');
+  const pieces = [qr, badge, icon];
   const homes = new Map();
   let phase = 'closed', flights = [], ticket = 0, previousFocus = null;
   qr.setAttribute('role', 'button');
@@ -25,7 +27,7 @@
     });
     element.before(placeholder);
     const rect = element.getBoundingClientRect();
-    homes.set(element, { placeholder, rect, width: element.offsetWidth, angle: element === qr ? 7 : 0 });
+    homes.set(element, { placeholder, rect, width: element.offsetWidth, angle: element === qr ? 7 : element === icon ? -7 : 0 });
   }
   function restore() {
     stopFlights();
@@ -50,56 +52,45 @@
     const dy = origin.top + origin.height / 2 - target.top - target.height / 2;
     const scale = home.width / element.offsetWidth;
     const pose = (x, y, size, angle) => `translate(${x}px,${y}px) scale(${size}) rotate(${angle}deg)`;
-    const isCode = element === qr;
-    // Reuse Source onboarding's sampled quadratic arc, then settle with a soft wobble.
-    const arcFrames = (from, to, endOffset, returning) => {
-      const vx=to.x-from.x,vy=to.y-from.y,distance=Math.hypot(vx,vy);
-      const bend=Math.min(320,distance*.9)*(isCode?1:-1)*(returning?-1:1);
-      const cx=(from.x+to.x)/2-vy/(distance||1)*bend;
-      const cy=(from.y+to.y)/2+vx/(distance||1)*bend;
-      return Array.from({length:33},(_,index)=>{
-        const t=index/32,u=1-t;
-        const x=u*u*from.x+2*u*t*cx+t*t*to.x;
-        const y=u*u*from.y+2*u*t*cy+t*t*to.y;
-        const size=from.scale+(to.scale-from.scale)*t;
-        const angle=from.angle+(to.angle-from.angle)*t-6*Math.sin(Math.PI*t);
-        return {offset:t*endOffset,transform:pose(x,y,size,angle)};
-      });
-    };
-    let frames;
-    if (direction === 'in') {
-      frames=arcFrames({x:dx,y:dy,scale,angle:home.angle},{x:0,y:0,scale:1.035,angle:-2.5},.76,false);
-      frames.push(
-        {transform:pose(0,2,.99,1.7),offset:.87},
-        {transform:pose(0,-1,1.005,-.55),offset:.95},
-        {transform:'none',offset:1}
-      );
-      if (isCode) {
-        frames[0].borderRadius = `${26 / scale}px`;
-        frames[0].backgroundColor = '#f2ffd6';
-        frames[32].backgroundColor = '#dfff3f';
-        frames[frames.length-1].backgroundColor = '#dfff3f';
-        frames[frames.length-1].borderRadius = '40px';
-      }
-    } else {
-      // Capture the in-flight pose too, so an early dismissal has no position jump.
+    const isCode = element === qr, isIcon = element === icon;
+    const entering = direction === 'in';
+    const duration = entering ? (isIcon ? 1140 : isCode ? 1000 : 1040) : (isIcon ? 850 : isCode ? 750 : 790);
+    let from;
+    if (entering) from={x:dx,y:dy,scale,angle:home.angle};
+    else {
+      // Continue from the current pose if the user dismisses during the entrance.
       const matrix=new DOMMatrixReadOnly(startTransform);
-      const from={x:matrix.m41,y:matrix.m42,scale:Math.hypot(matrix.a,matrix.b),angle:Math.atan2(matrix.b,matrix.a)*180/Math.PI};
-      frames=arcFrames(from,{x:dx,y:dy,scale:scale*.98,angle:home.angle+2},.79,true);
-      frames.push(
-        {transform:pose(dx,dy,scale*1.01,home.angle-.8),offset:.92},
-        {transform:pose(dx,dy,scale,home.angle),offset:1}
-      );
-      if (isCode) {
-        frames[0].borderRadius = startRadius;
-        frames[0].backgroundColor = startColor;
-        frames[frames.length-1].borderRadius = `${26 / scale}px`;
-        frames[frames.length-1].backgroundColor = '#f2ffd6';
-      }
+      from={x:matrix.m41,y:matrix.m42,scale:Math.hypot(matrix.a,matrix.b),angle:Math.atan2(matrix.b,matrix.a)*180/Math.PI};
     }
-    return element.animate(frames, {
-      duration: direction === 'in' ? (isCode ? 1000 : 1120) : (isCode ? 660 : 700),
-      easing: 'cubic-bezier(.25,.55,.3,1)', fill: 'both'
+    const to=entering ? {x:0,y:0,scale:1,angle:isIcon?-7:0} : {x:dx,y:dy,scale,angle:home.angle};
+    const vx=to.x-from.x,vy=to.y-from.y,distance=Math.hypot(vx,vy);
+    // Source's quadratic flight paths, with a lower swoop for the app icon.
+    const bend=Math.min(320,distance*.9)*(isCode?1:-1)*(entering?1:-1);
+    const cx=(from.x+to.x)/2-(isIcon?0:vy/(distance||1)*bend);
+    const cy=isIcon ? Math.max(from.y,to.y)+Math.min(120,distance*.3) : (from.y+to.y)/2+vx/(distance||1)*bend;
+    // One damped spring drives position, scale and rotation for all three pieces.
+    const damping=.72,frequency=11.5,decay=damping*frequency;
+    const oscillation=frequency*Math.sqrt(1-damping*damping);
+    const frames=Array.from({length:97},(_,index)=>{
+      const offset=index/96,time=offset*duration/1000;
+      const envelope=Math.exp(-decay*time);
+      const progress=index===96?1:1-envelope*(Math.cos(oscillation*time)+decay/oscillation*Math.sin(oscillation*time));
+      const u=1-progress;
+      const x=u*u*from.x+2*u*progress*cx+progress*progress*to.x;
+      const y=u*u*from.y+2*u*progress*cy+progress*progress*to.y;
+      const size=from.scale+(to.scale-from.scale)*progress;
+      const wobble=index===96?0:-65/oscillation*envelope*Math.sin(oscillation*time);
+      const angle=from.angle+(to.angle-from.angle)*progress+wobble;
+      return {offset,transform:pose(x,y,size,angle)};
+    });
+    if(isCode){
+      frames[0].borderRadius=entering?`${26/scale}px`:startRadius;
+      frames[0].backgroundColor=entering?'#f2ffd6':startColor;
+      frames[frames.length-1].borderRadius=entering?'40px':`${26/scale}px`;
+      frames[frames.length-1].backgroundColor=entering?'#dfff3f':'#f2ffd6';
+    }
+    return element.animate(frames,{
+      duration,delay:entering&&isIcon?60:0,easing:'linear',fill:'both'
     });
   }
   async function openQR() {
@@ -113,6 +104,7 @@
     dialog.showModal();
     badgeSlot.append(badge);
     codeSlot.append(qr);
+    iconSlot.append(icon);
     qr.tabIndex = -1;
     badge.focus({ preventScroll: true });
     requestAnimationFrame(() => { if (dialog.open && phase !== 'closing') dialog.classList.add('is-visible'); });

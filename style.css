@@ -250,7 +250,7 @@ body.is-dragging-sticker,body.is-dragging-sticker *{cursor:grabbing!important}
  .hero-art-note{margin-top:0;line-height:1.25}
 }
 
-/* The real QR card and download badge fly into the native modal together. */
+/* The real QR card, app icon and download badge fly into the native modal together. */
 body.qr-modal-open{overflow:hidden}
 .qr-dialog{position:fixed;inset:0;width:100%;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;overflow:hidden;color:var(--ink)}
 .qr-dialog:focus{outline:none}
@@ -258,6 +258,8 @@ body.qr-modal-open{overflow:hidden}
 .qr-dialog.is-visible::backdrop{opacity:1}
 .qr-modal-layout{--qr-size:min(360px,calc(100vw - 64px),calc(100dvh - 190px));position:absolute;left:50%;top:50%;translate:-50% -50%;display:flex;flex-direction:column;align-items:center;gap:24px;width:var(--qr-size);pointer-events:none}
 .qr-modal-badge-slot{width:200px;height:66.8538px;position:relative}
+
+
 .qr-modal-code-slot{width:var(--qr-size);height:var(--qr-size);position:relative}
 .qr-dialog .hero-qr{display:grid;width:100%;height:100%;padding:11.7647%;margin:0;border:0;border-radius:40px;background:var(--lime);transform:none;translate:none;transition:none;pointer-events:auto;cursor:default;box-shadow:0 24px 70px #0005}
 .qr-dialog .app-store-badge{display:block;width:100%;height:100%;pointer-events:auto;transform-origin:center}
@@ -282,3 +284,8 @@ body.qr-modal-open{overflow:hidden}
 }
 .collection .is-jelly-dragging .device-flipper{animation-play-state:paused}
 .collection .is-jelly-dragging .is-jelly-top{translate:0 -6px}
+
+/* The icon rests over the QR's generous bottom quiet border, below every dot. */
+.qr-modal-layout{--icon-size:calc(var(--qr-size)*.28);padding-bottom:calc(var(--icon-size)*.54)}
+.qr-modal-icon-slot{position:absolute;left:50%;top:calc(100% - var(--icon-size)*.46);margin-left:calc(var(--icon-size)*-.5);width:var(--icon-size);height:var(--icon-size);z-index:3;pointer-events:none}
+.qr-dialog .hero-app-icon{display:inline-grid;width:100%;height:100%;margin:0;transform:rotate(-7deg);filter:drop-shadow(2px 6px 3px #10121c35)}
