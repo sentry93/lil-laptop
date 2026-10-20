@@ -37,15 +37,13 @@
     });
     homes.clear();
     if (!reduced.matches) {
-      // Carry the transparent return shadow into the compact card, then ease it in.
-      qr.style.transition = 'none';
-      const shadow = getComputedStyle(qr).boxShadow;
-      compactShadow?.cancel();
-      compactShadow = qr.animate([
-        { boxShadow: '0 0 0 0 rgba(0,0,0,0)' },
-        { boxShadow: shadow }
-      ], { duration: 300, easing: 'ease-out' });
-      qr.style.removeProperty('transition');
+      // Start transparent, then let CSS ease toward the current normal or hover shadow.
+      qr.classList.add('qr-shadow-restoring');
+      getComputedStyle(qr).boxShadow;
+      compactShadow = requestAnimationFrame(() => {
+        qr.classList.remove('qr-shadow-restoring');
+        compactShadow = null;
+      });
     }
     dialog.classList.remove('is-visible');
     document.body.classList.remove('qr-modal-open');
@@ -113,7 +111,8 @@
   async function openQR() {
     if (phase !== 'closed') return;
     const ownTicket = ++ticket;
-    compactShadow?.cancel(); compactShadow = null;
+    if (compactShadow !== null) cancelAnimationFrame(compactShadow);
+    compactShadow = null; qr.classList.remove('qr-shadow-restoring');
     previousFocus = document.activeElement;
     pieces.forEach(rememberHome);
     setPhase('opening');
