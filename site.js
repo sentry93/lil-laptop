@@ -1,4 +1,4 @@
-const models = [{"id":"powerbook170","name":"Power Notebook","description":"A trackball. Chunky keys. A very good beginning.","variants":[{"id":"graphite","name":"Graphite","color":"#62635D","front":"model-powerbook170-front.webp","back":"model-powerbook170-lid.webp"}]},{"id":"ibook1999","name":"Jelly Notebook","description":"A little colour goes a long way. Pick your flavour.","variants":[{"id":"blueberry","name":"Blueberry","color":"#00BDC3","front":"model-ibook1999-front.webp","back":"model-ibook1999-lid.webp"},{"id":"tangerine","name":"Tangerine","color":"#FF7A08","front":"model-ibook1999-tangerine-front.webp","back":"model-ibook1999-tangerine-lid.webp"},{"id":"hotpink","name":"Hot Pink","color":"#FF159A","front":"model-ibook1999-hotpink-front.webp","back":"model-ibook1999-hotpink-lid.webp"},{"id":"neongreen","name":"Neon Green","color":"#A8FF00","front":"model-ibook1999-neongreen-front.webp","back":"model-ibook1999-neongreen-lid.webp"}]},{"id":"titanium2001","name":"Titanium Notebook","description":"Cool metal. Dark keys. Turn-of-the-century energy.","variants":[{"id":"titanium","name":"Titanium","color":"#B4B5B0","front":"model-titanium2001-front.webp","back":"model-titanium2001-lid.webp"}]},{"id":"macbook2006","name":"Snow Notebook","description":"The little white laptop you never quite forgot.","variants":[{"id":"white","name":"White","color":"#F6F4EC","front":"model-macbook2006-front.webp","back":"model-macbook2006-lid.webp"}]},{"id":"unibody2008","name":"Alloy Pro","description":"Black glass, silver edges, and a place for your ideas.","variants":[{"id":"silver","name":"Silver","color":"#BBBEC0","front":"model-unibody2008-front.webp","back":"model-unibody2008-lid.webp"}]},{"id":"pro2021","name":"Studio Pro","description":"A familiar modern desktop. A very personal little world.","variants":[{"id":"spacegray","name":"Space Gray","color":"#7D8084","front":"model-pro2021-front.webp","back":"model-pro2021-lid.webp"},{"id":"silver","name":"Silver","color":"#BDC0C2","front":"model-pro2021-silver-front.webp","back":"model-pro2021-silver-lid.webp"}]}];
+const models = [{"id":"powerbook170","name":"Power Notebook","description":"A trackball. Chunky keys. A very good beginning.","variants":[{"id":"graphite","name":"Graphite","color":"#62635D","front":"model-powerbook170-front.webp","back":"hero-power-rear.webp?v=20261019-campaign"}]},{"id":"ibook1999","name":"Jelly Clamshell","description":"A little colour goes a long way. Pick your flavour.","variants":[{"id":"blueberry","name":"Blueberry","color":"#00BDC3","front":"model-ibook1999-front.webp","back":"hero-blue-rear.webp?v=20261019-campaign"},{"id":"tangerine","name":"Tangerine","color":"#FF7A08","front":"model-ibook1999-tangerine-front.webp","back":"hero-orange-rear.webp?v=20261019-campaign"},{"id":"hotpink","name":"Hot Pink","color":"#FF159A","front":"model-ibook1999-hotpink-front.webp","back":"hero-pink-rear.webp?v=20261019-campaign"},{"id":"neongreen","name":"Neon Green","color":"#A8FF00","front":"model-ibook1999-neongreen-front.webp","back":"hero-green-rear.webp?v=20261019-campaign"}]},{"id":"titanium2001","name":"Aluminium Feather","description":"Cool metal. Dark keys. Turn-of-the-century energy.","variants":[{"id":"titanium","name":"Aluminium","color":"#B4B5B0","front":"model-titanium2001-front.webp","back":"hero-titanium-rear.webp?v=20261019-campaign"}]},{"id":"macbook2006","name":"Glossy Snow","description":"The little white laptop you never quite forgot.","variants":[{"id":"white","name":"White","color":"#F6F4EC","front":"model-macbook2006-front.webp","back":"hero-snow-rear.webp?v=20261019-campaign"}]},{"id":"unibody2008","name":"Alloy Pro","description":"Black glass, silver edges, and a place for your ideas.","variants":[{"id":"silver","name":"Silver","color":"#BBBEC0","front":"model-unibody2008-front.webp","back":"hero-alloy-rear.webp?v=20261019-campaign"}]},{"id":"pro2021","name":"Studio Pro","description":"A familiar modern desktop. A very personal little world.","variants":[{"id":"spacegray","name":"Space Gray","color":"#7D8084","front":"model-pro2021-front.webp","back":"hero-studio-rear.webp?v=20261019-campaign"},{"id":"silver","name":"Silver","color":"#BDC0C2","front":"model-pro2021-silver-front.webp","back":"model-pro2021-silver-lid.webp"}]}];
 (() => {
   'use strict';
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -47,7 +47,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   const placed = document.querySelector('#placed-stickers');
   const status = document.querySelector('#playground-status');
   const stickerNames = {"bow": "Checked Bow", "flower": "Power Flower", "make-stuff": "Make Stuff", "open-late": "Open Late", "circuit-club-01": "Desktop Garden", "circuit-club-02": "Side A", "circuit-club-03": "Pocket Rangefinder", "circuit-club-04": "Patch Cable", "circuit-club-05": "Waveform Lab", "circuit-club-06": "Keycap Trio", "circuit-club-07": "Minute Keeper", "circuit-club-08": "Extra Life", "circuit-club-09": "Save Something", "circuit-club-10": "Human Inside", "circuit-club-11": "Orbital Relay", "wayfarer-01": "Lunar Moth", "wayfarer-02": "Quiet Heron", "wayfarer-03": "Fern Frond", "wayfarer-04": "Long Way Home", "wayfarer-05": "Forest Floor", "wayfarer-06": "Slow Traveller", "wayfarer-07": "Jewel Beetle", "wayfarer-08": "Silver Sardine", "wayfarer-09": "Ribbon Snake", "wayfarer-10": "Moon Study", "wayfarer-11": "Wild Stems", "wayfarer-12": "Elsewhere Map", "fruit-stand-01": "Late Lunch Tin", "fruit-stand-02": "Iced Matcha", "fruit-stand-03": "Blue Espresso", "fruit-stand-04": "Special Delivery", "fruit-stand-05": "Night Owl Matches", "fruit-stand-06": "Striped Vase", "fruit-stand-07": "Red Canvas", "fruit-stand-08": "Lucky Charms", "fruit-stand-10": "Good Eggs", "fruit-stand-11": "Day Dream Bottle", "fruit-stand-12": "One More Chapter", "type-and-play-02": "Soft Ware", "type-and-play-04": "Stay Curious", "type-and-play-05": "Slow Is A Speed", "type-and-play-06": "And Then Some", "type-and-play-07": "Less But Better", "type-and-play-08": "One More Page", "type-and-play-09": "Local Only", "type-and-play-10": "Side Quest", "type-and-play-11": "A Little Wonder", "type-and-play-12": "Good Enough"};
-  const lidLooks=[{"id":"powerbook170","jelly":false,"markColor":"#282C2D","name":"Power Notebook","src":"play-lid-powerbook170.webp","variant":"Graphite"},{"id":"ibook1999","jelly":true,"markColor":"#00ADB5","name":"Jelly Notebook","src":"play-lid-ibook1999.webp","variant":"Blueberry"},{"id":"ibook1999-tangerine","jelly":true,"markColor":"#FF7900","name":"Jelly Notebook","src":"play-lid-ibook1999-tangerine.webp","variant":"Tangerine"},{"id":"ibook1999-hotpink","jelly":true,"markColor":"#F20B89","name":"Jelly Notebook","src":"play-lid-ibook1999-hotpink.webp","variant":"Hot Pink"},{"id":"ibook1999-neongreen","jelly":true,"markColor":"#9CF000","name":"Jelly Notebook","src":"play-lid-ibook1999-neongreen.webp","variant":"Neon Green"},{"id":"titanium2001","jelly":false,"markColor":"#F2F4EF","name":"Titanium Notebook","src":"play-lid-titanium2001.webp","variant":"Titanium"},{"id":"macbook2006","jelly":false,"markColor":"#F2F4EF","name":"Snow Notebook","src":"play-lid-macbook2006.webp","variant":"White"},{"id":"unibody2008","jelly":false,"markColor":"#F2F4EF","name":"Alloy Pro","src":"play-lid-unibody2008.webp","variant":"Silver"},{"id":"pro2021","jelly":false,"markColor":"#282C2D","name":"Studio Pro","src":"play-lid-pro2021.webp","variant":"Space Gray"}];
+  const lidLooks=[{"id":"powerbook170","jelly":false,"markColor":"#282C2D","name":"Power Notebook","src":"play-lid-powerbook170.webp","variant":"Graphite"},{"id":"ibook1999","jelly":true,"markColor":"#00ADB5","name":"Jelly Clamshell","src":"play-lid-ibook1999.webp","variant":"Blueberry"},{"id":"ibook1999-tangerine","jelly":true,"markColor":"#FF7900","name":"Jelly Clamshell","src":"play-lid-ibook1999-tangerine.webp","variant":"Tangerine"},{"id":"ibook1999-hotpink","jelly":true,"markColor":"#F20B89","name":"Jelly Clamshell","src":"play-lid-ibook1999-hotpink.webp","variant":"Hot Pink"},{"id":"ibook1999-neongreen","jelly":true,"markColor":"#9CF000","name":"Jelly Clamshell","src":"play-lid-ibook1999-neongreen.webp","variant":"Neon Green"},{"id":"titanium2001","jelly":false,"markColor":"#F2F4EF","name":"Aluminium Feather","src":"play-lid-titanium2001.webp","variant":"Aluminium"},{"id":"macbook2006","jelly":false,"markColor":"#F2F4EF","name":"Glossy Snow","src":"play-lid-macbook2006.webp","variant":"White"},{"id":"unibody2008","jelly":false,"markColor":"#F2F4EF","name":"Alloy Pro","src":"play-lid-unibody2008.webp","variant":"Silver"},{"id":"pro2021","jelly":false,"markColor":"#282C2D","name":"Studio Pro","src":"play-lid-pro2021.webp","variant":"Space Gray"}];
   const lidImage=document.querySelector('.playground-lid');
   const lidButton=document.querySelector('#cycle-lid');
   const lidMark=document.querySelector('.playground-mark');
@@ -224,18 +224,18 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   const heroLabel = document.querySelector('#hero-model-name');
   const heroButton = document.querySelector('#hero-device-button');
   const looks = [
-    {id:'blue',name:'Jelly Notebook / Blueberry'},
+    {id:'blue',name:'Jelly Clamshell / Blueberry'},
     {id:'power',name:'Power Notebook / Graphite'},
-    {id:'orange',name:'Jelly Notebook / Tangerine'},
-    {id:'snow',name:'Snow Notebook / White'},
+    {id:'orange',name:'Jelly Clamshell / Tangerine'},
+    {id:'snow',name:'Glossy Snow / White'},
     {id:'studio',name:'Studio Pro / Space Gray'}
-  ].map(look=>({...look,open:`hero-${look.id}-open.webp?v=20261019-seamless`,rear:`hero-${look.id}-rear.webp?v=20261019-seamless`}));
+  ].map(look=>({...look,open:`hero-${look.id}-open.webp?v=20261019-campaign`,rear:`hero-${look.id}-rear.webp?v=20261019-campaign`}));
   const decorationChoices = ['bow','flower','circuit-club-02','circuit-club-03','circuit-club-06','circuit-club-07','circuit-club-08','wayfarer-01'];
-  const deckLayouts = [[[1.33257, 0.15715, -0.41974, 0.83388, 150.048, 747.356]], [[1.21418, 0.55567, -0.85289, 0.74353, 678.793, 857.279]], [[1.18913, 0.06161, -0.23191, 0.72726, 168.432, 723.095], [0.96033, 0.43762, -0.83238, 0.6305, 170.907, 787.325]], [[1.15795, 0.48914, -0.75404, 0.70528, 681.511, 838.569], [1.23453, 0.06965, -0.08422, 0.82279, 619.632, 942.954]], [[1.32041, 0.18609, -0.47164, 0.83003, 140.348, 750.682], [1.12384, 0.55845, -0.85187, 0.69379, 670.154, 881.828]], [[1.09999, 0.45313, -0.88951, 0.70588, 172.98, 743.15], [1.27596, 0.09748, -0.12626, 0.81982, 639.265, 860.14], [0.95171, 0.45132, -0.67307, 0.60288, 663.977, 934.311]]];
+  const deckLayouts = [[[0.81287,0.09586,-0.25604,0.50867,250.1585,768.7735]],[[0.55852,0.25561,-0.39233,0.34202,670.6905,858.1185]],[[0.70159,0.03635,-0.13683,0.42908,249.762,768.7285],[0.41294,0.18818,-0.35792,0.27111,280.249,790.0355]],[[0.46318,0.19566,-0.30162,0.28211,678.922,860.1115],[0.34567,0.0195,-0.02358,0.23038,647.8955,884.506]],[[0.81865,0.11538,-0.29242,0.51462,251.6885,767.5],[0.5282,0.26247,-0.40038,0.32608,672.609,858.5725]],[[0.57199,0.23563,-0.46255,0.36706,274.528,771.8655],[0.5997,0.04582,-0.05934,0.38532,652.982,865.443]]];
   const deckSlots=[...document.querySelectorAll('[data-deck-sticker]')];
   const cloudSlots=[...document.querySelectorAll('[data-cloud-sticker] img')];
   let duoFinish='black';
-  let introActive=false,introTimer=null,introToken=0;
+  let introActive=false,introTimer=null,introToken=0,introBounce=null;
   let lookIndex=0, heroRear=false, lastDeckLayout=-1, lastCloudSlot=-1;
   let heroTimer=null, heroMotion=null, heroHover=false, heroFocus=false, transitionID=0;
   let cloudTimer=null;
@@ -272,8 +272,17 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   }
   const blocked = () => reduced.matches || document.hidden || heroHover || heroFocus || heroRear;
   const paused = () => blocked() || introActive;
-  function stopIntro(){introToken++;introActive=false;clearTimeout(introTimer);introTimer=null;heroButton.dataset.intro='complete';}
-  function heroSource(look,rear){return duoFinish==='silver'?`hero-${look.id}-silver-${rear?'rear':'open'}.webp?v=20261019-seamless`:(rear?look.rear:look.open);}
+  function stopIntro(){introToken++;introActive=false;clearTimeout(introTimer);introTimer=null;if(introBounce){introBounce.cancel();introBounce=null;}heroButton.dataset.intro='complete';}
+  function bounceIntro(){
+    if(reduced.matches)return;
+    if(introBounce)introBounce.cancel();
+    introBounce=heroSurface.animate([
+      {scale:'.95',translate:'0 4px'},
+      {scale:'1.06',translate:'0 -6px',offset:.45},
+      {scale:'1',translate:'0 0'}
+    ],{duration:105,easing:'cubic-bezier(.2,.8,.3,1)'});
+  }
+  function heroSource(look,rear){return duoFinish==='silver'?`hero-${look.id}-silver-${rear?'rear':'open'}.webp?v=20261019-campaign`:(rear?look.rear:look.open);}
   function startIntro(){
     if(blocked()){scheduleHero();return;}
     introActive=true;heroButton.dataset.intro='loading';const token=++introToken;
@@ -284,11 +293,11 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
       const next=()=>{
         if(token!==introToken)return;
         if(blocked()){stopIntro();scheduleHero();return;}
-        lookIndex=(++step)%looks.length;paintHero();
-        if(step===looks.length){stopIntro();changeDeck();scheduleHero();return;}
-        introTimer=setTimeout(next,150);
+        lookIndex=(++step)%looks.length;paintHero();bounceIntro();
+        if(step===looks.length){introTimer=setTimeout(()=>{stopIntro();changeDeck();scheduleHero();},105);return;}
+        introTimer=setTimeout(next,110);
       };
-      introTimer=setTimeout(next,150);
+      introTimer=setTimeout(next,110);
     });
   }
   function paintHero() {
@@ -296,6 +305,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     heroImage.alt=heroRear?`${look.name}, partly open with its back lid facing you on ${duoFinish} iPhone Duo.`:`${look.name} on ${duoFinish} iPhone Duo in the angled open pose, with stickers around its trackpad.`;
     heroLabel.textContent=look.name;heroButton.dataset.look=look.id;heroButton.dataset.finish=duoFinish;
     heroButton.dataset.side=heroRear?'back':'open';
+    document.querySelector('#hero-interaction-hint').textContent=heroRear?'back lid':'front open';
     heroButton.setAttribute('aria-pressed',String(heroRear));
     heroButton.setAttribute('aria-label',heroRear?`Spin to the front of ${look.name}`:`Spin to the back of ${look.name}`);
   }
@@ -338,17 +348,26 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   function cycleHero(){heroTimer=null;if(!paused())moveHero(()=>{lookIndex=(lookIndex+1)%looks.length;changeDeck();});}
   function syncHero(){
     if(introActive)stopIntro();
-    // Hover always holds a complete render, never a half-faded bounce frame.
     if(heroMotion&&!heroButton.dataset.spinning){cancelHeroMotion();paintHero();}
     scheduleHero();
   }
-  heroButton.addEventListener('click',()=>{
-    stopIntro();
-    const next=!heroRear;heroButton.dataset.spinning='true';
-    moveHero(()=>{heroRear=next;},true).finally(()=>{delete heroButton.dataset.spinning;scheduleHero();});
+  function showHeroSide(rear){
+    stopIntro();heroButton.dataset.spinning='true';
+    return moveHero(()=>{heroRear=rear;},true).finally(()=>{delete heroButton.dataset.spinning;scheduleHero();});
+  }
+  heroButton.addEventListener('click',event=>{
+    // Hover owns the mouse view; touch and keyboard keep a deliberate toggle.
+    if(event.pointerType==='mouse'&&heroHover)return;
+    showHeroSide(!heroRear);
   });
-  heroArt.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'){heroHover=true;syncHero();}});
-  heroArt.addEventListener('pointerleave',()=>{heroHover=false;delete heroButton.dataset.spinning;cancelHeroMotion();heroRear=false;paintHero();scheduleHero();});
+  heroButton.addEventListener('pointerenter',event=>{
+    if(event.pointerType!=='mouse')return;
+    heroHover=true;showHeroSide(true);
+  });
+  heroButton.addEventListener('pointerleave',event=>{
+    if(event.pointerType!=='mouse')return;
+    heroHover=false;showHeroSide(false);
+  });
   heroButton.addEventListener('focusin',()=>{heroFocus=heroButton.matches(':focus-visible');syncHero();});
   heroButton.addEventListener('focusout',()=>{heroFocus=false;heroRear=false;cancelHeroMotion();paintHero();scheduleHero();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){stopIntro();cancelHeroMotion();heroRear=false;paintHero();}scheduleHero();scheduleCloud();});
@@ -362,26 +381,25 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
     looks.forEach(look=>[false,true].forEach(rear=>{const image=new Image();image.src=heroSource(look,rear);}));
   }));
   // Start loading the alternate finish without delaying the first complete device.
-  looks.forEach(look=>['open','rear'].forEach(side=>{const image=new Image();image.src=`hero-${look.id}-silver-${side}.webp?v=20261019-seamless`;}));
+  looks.forEach(look=>['open','rear'].forEach(side=>{const image=new Image();image.src=`hero-${look.id}-silver-${side}.webp?v=20261019-campaign`;}));
   changeDeck();paintHero();startIntro();scheduleCloud();
 
   const tilt = document.querySelector('.tilt');
   let frame = null;
-  tilt.addEventListener('pointermove', event => {
-    if (reduced.matches || event.pointerType !== 'mouse' || !window.matchMedia('(hover: hover)').matches) return;
-    const box = tilt.getBoundingClientRect();
-    const x = (event.clientX-box.left)/box.width-.5;
-    const y = (event.clientY-box.top)/box.height-.5;
-    if (frame) cancelAnimationFrame(frame);
-    frame = requestAnimationFrame(() => {
+  window.addEventListener('pointermove', event => {
+    if(reduced.matches||event.pointerType!=='mouse'||!window.matchMedia('(hover: hover)').matches)return;
+    const x=Math.max(-.5,Math.min(.5,event.clientX/window.innerWidth-.5));
+    const y=Math.max(-.5,Math.min(.5,event.clientY/window.innerHeight-.5));
+    if(frame)cancelAnimationFrame(frame);
+    frame=requestAnimationFrame(()=>{
       tilt.style.setProperty('--rx',`${-y*9}deg`);
       tilt.style.setProperty('--ry',`${x*12}deg`);
-      frame = null;
+      frame=null;
     });
-  });
-  tilt.addEventListener('pointerleave',() => {
-    if (frame) cancelAnimationFrame(frame);
-    tilt.style.setProperty('--rx','0deg'); tilt.style.setProperty('--ry','0deg');
+  },{passive:true});
+  document.documentElement.addEventListener('pointerleave',()=>{
+    if(frame)cancelAnimationFrame(frame);
+    tilt.style.setProperty('--rx','0deg');tilt.style.setProperty('--ry','0deg');
   });
   // All content is visible by default; motion is an enhancement.
   if ('IntersectionObserver' in window && !reduced.matches) {

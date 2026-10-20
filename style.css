@@ -57,7 +57,7 @@
 @media(max-width:600px){.hero-foot>span:first-child{font-size:8px;letter-spacing:1px}}
 /* Hover through desktops, flip the collection, and decorate a whole little lid wardrobe. */
 .hero-app-icon{width:84px;height:84px;object-fit:contain;margin:0 0 26px;transform:rotate(-7deg);filter:drop-shadow(3px 6px 2px #14171f1c)}
-.hero-foot{position:relative;justify-content:center}.hero-foot>.hero-foot-caption:first-child{font-size:10px;text-align:center;letter-spacing:1.4px}.hero-foot>.hero-foot-star:last-child{display:block;position:absolute;right:58px;font-size:30px;line-height:1}
+.hero-foot{position:relative;justify-content:flex-start}.hero-foot>.hero-foot-caption:first-child{font-size:10px;text-align:left;letter-spacing:1.4px}.hero-foot>.hero-foot-star:last-child{display:block;position:absolute;right:58px;font-size:30px;line-height:1}
 .model-preview{display:block;position:relative;width:100%;padding:0;border:0;background:transparent;color:inherit;cursor:grab;touch-action:pan-x pan-y}.model-preview:active{cursor:grabbing}.device-flipper,.device-face{display:block}.model-preview:focus-visible{outline:2px dashed var(--lime);outline-offset:4px;border-radius:25px}
 .model-card[data-model=ibook1999]{flex-basis:560px;width:560px}.jelly-stage .device-face{padding:0}.jelly-stage .device-face img{position:absolute;width:37%;height:100%;object-fit:contain;top:0}.jelly-stage .jelly-0{left:-5%;transform:translateY(12px) rotate(-9deg);z-index:1}.jelly-stage .jelly-1{left:19%;transform:translateY(-13px) rotate(-3deg);z-index:2}.jelly-stage .jelly-2{left:43%;transform:translateY(7px) rotate(4deg);z-index:3}.jelly-stage .jelly-3{left:67%;transform:translateY(-4px) rotate(10deg);z-index:4}.jelly-stage .device-front:after{display:none}.jelly-stage .device-back img{height:85%;top:7%}.model-card[data-model=ibook1999]>p{max-width:360px}
 .models-grid,.personal-studio .sticker-tray{scrollbar-width:none;-ms-overflow-style:none}.models-grid::-webkit-scrollbar,.sticker-tray::-webkit-scrollbar{display:none;width:0;height:0}
@@ -86,15 +86,15 @@ body.is-dragging-sticker,body.is-dragging-sticker *{cursor:grabbing!important}
 
 .site-header .nav-icon .app-icon-shell img{width:100%;height:100%}
 
-.hero-foot .hero-foot-caption{display:flex;align-items:center;justify-content:center;gap:12px}
-.duo-finishes{display:inline-flex;align-items:center;gap:3px}
-.duo-finishes button{display:grid;place-items:center;width:27px;height:27px;border:1px solid transparent;border-radius:50%;padding:4px;background:transparent;transition:transform .2s,border-color .2s}
-.duo-finishes button[aria-pressed=true]{border-color:#14171f99}
-.duo-finishes button:hover{transform:translateY(-2px)}
-.finish-dot{width:16px;height:16px;display:block;border-radius:50%;border:1px solid #14171f55;box-shadow:inset 1px 1px 2px #fff6}
+.hero-foot .hero-foot-caption{display:flex;align-items:center;justify-content:flex-start;gap:9px}
+.duo-finishes{display:inline-flex;align-items:center;gap:0}
+.duo-finishes button{display:grid;place-items:center;width:20px;height:24px;border:0;border-radius:50%;padding:5px;background:transparent;transition:transform .2s,border-color .2s}
+.duo-finishes button[aria-pressed=true] .finish-dot{outline:1px solid #14171f40;outline-offset:2px}
+.duo-finishes button:hover{transform:translateY(-1px)}
+.finish-dot{width:10px;height:10px;display:block;border-radius:50%;border:1px solid #14171f55;box-shadow:inset 1px 1px 2px #fff6}
 .finish-black{background:linear-gradient(135deg,#535b65,#10151c)}
 .finish-silver{background:linear-gradient(135deg,#fff,#aab2bc)}
-@media(max-width:600px){.hero-foot .hero-foot-caption{gap:7px}.duo-finishes button{width:25px;height:25px}}
+@media(max-width:600px){.hero-foot .hero-foot-caption{gap:7px}.duo-finishes button{width:20px;height:24px}}
 
 /* Native transparent export supplies the corners; no CSS crop or mask. */
 .app-icon-shell img{display:block;width:100%;height:100%;object-fit:contain}
@@ -104,3 +104,5 @@ body.is-dragging-sticker,body.is-dragging-sticker *{cursor:grabbing!important}
 .footer-credit{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
 .footer-credit p{margin:0;color:#454a31}
 @media(max-width:600px){.footer-credit{gap:10px}.footer-credit .brand{font-size:20px}.footer-credit p{font-size:9px}}
+
+.hero-art-note{min-height:16px}.collection .device-back img{object-fit:contain}
