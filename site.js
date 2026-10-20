@@ -2,6 +2,18 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
 (() => {
   'use strict';
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const header = document.querySelector('.site-header');
+  const heroSection = document.querySelector('.hero');
+  let headerFrame = 0;
+  function syncHeaderIcon(){
+    headerFrame = 0;
+    const hero = heroSection.getBoundingClientRect();
+    const remaining = Math.max(0, hero.bottom - header.offsetHeight);
+    header.classList.toggle('hero-scrolled',remaining < hero.height * .2);
+  }
+  window.addEventListener('scroll',()=>{if(!headerFrame)headerFrame=requestAnimationFrame(syncHeaderIcon);},{passive:true});
+  window.addEventListener('resize',syncHeaderIcon);
+  syncHeaderIcon();
 
   const collection = document.querySelector('#collection');
   const sideButtons = [...collection.querySelectorAll('[data-side]')];
@@ -118,8 +130,58 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
       }
     });
     if (announce) status.textContent = `${stickerNames[kind]} added. Drag it on the lid, or focus it and use the arrow keys.`;
+    return sticker;
   }
-  document.querySelectorAll('[data-sticker]').forEach(button => button.addEventListener('click',() => addSticker(button.dataset.sticker)));
+  document.querySelectorAll('[data-sticker]').forEach(button => {
+    let drag = null, ignoreClick = false;
+    const img = button.querySelector('img');
+    img.draggable = false;
+    button.addEventListener('dragstart',event=>event.preventDefault());
+    button.addEventListener('click',event=>{
+      if(ignoreClick){event.preventDefault();ignoreClick=false;return;}
+      addSticker(button.dataset.sticker);
+    });
+    button.addEventListener('pointerdown',event=>{
+      if(event.button!==0)return;
+      ignoreClick=false;
+      drag={id:event.pointerId,x:event.clientX,y:event.clientY,ghost:null};
+      button.setPointerCapture(event.pointerId);
+      if(event.pointerType!=='touch')event.preventDefault();
+    });
+    button.addEventListener('pointermove',event=>{
+      if(!drag||drag.id!==event.pointerId)return;
+      const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
+      if(!drag.ghost){
+        if(Math.hypot(dx,dy)<7)return;
+        // Touch swipes across the tray remain native horizontal scrolling.
+        if(event.pointerType==='touch'&&Math.abs(dx)>Math.abs(dy)*1.2)return;
+        ignoreClick=true;
+        drag.ghost=document.createElement('img');drag.ghost.src=img.src;
+        drag.ghost.className='sticker-drag-ghost';drag.ghost.alt='';drag.ghost.draggable=false;
+        document.body.append(drag.ghost);document.body.classList.add('is-dragging-sticker');
+        button.setPointerCapture(event.pointerId);
+      }
+      event.preventDefault();
+      drag.ghost.style.left=`${event.clientX}px`;drag.ghost.style.top=`${event.clientY}px`;
+      const r=canvas.getBoundingClientRect();
+      canvas.classList.toggle('is-drop-target',event.clientX>=r.left&&event.clientX<=r.right&&event.clientY>=r.top&&event.clientY<=r.bottom);
+    });
+    function finish(event){
+      if(!drag)return;
+      const current=drag;drag=null;
+      if(current.ghost){
+        const r=canvas.getBoundingClientRect();
+        if(event.type==='pointerup'&&event.clientX>=r.left&&event.clientX<=r.right&&event.clientY>=r.top&&event.clientY<=r.bottom){
+          const sticker=addSticker(button.dataset.sticker,false);
+          position(sticker,(event.clientX-r.left)/r.width,(event.clientY-r.top)/r.height);
+          status.textContent=`${stickerNames[button.dataset.sticker]} placed on your lid. Looking very you.`;
+        }
+        current.ghost.remove();document.body.classList.remove('is-dragging-sticker');canvas.classList.remove('is-drop-target');
+      }
+      if(button.hasPointerCapture(current.id))button.releasePointerCapture(current.id);
+    }
+    ['pointerup','pointercancel','lostpointercapture'].forEach(type=>button.addEventListener(type,finish));
+  });
   document.querySelector('#reset-stickers').addEventListener('click',() => {
     placed.replaceChildren(); sequence = 0;
     status.textContent = 'A fresh lid. Make it yours.';
@@ -142,7 +204,7 @@ const models = [{"id":"powerbook170","name":"Power Notebook","description":"A tr
   function dragShelf(track){
     let drag=null,ignoreClick=false;
     track.addEventListener('pointerdown',event=>{
-      if(event.pointerType!=='mouse'||event.button!==0)return;
+      if(event.pointerType!=='mouse'||event.button!==0||event.target.closest('[data-sticker]'))return;
       drag={x:event.clientX,left:track.scrollLeft,id:event.pointerId,moved:false};
     });
     track.addEventListener('pointermove',event=>{
