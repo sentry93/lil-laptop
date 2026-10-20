@@ -86,8 +86,14 @@
     if(isCode){
       frames[0].borderRadius=entering?`${26/scale}px`:startRadius;
       frames[0].backgroundColor=entering?'#f2ffd6':startColor;
-      frames[frames.length-1].borderRadius=entering?'40px':`${26/scale}px`;
+      frames[frames.length-1].borderRadius=entering?'25.5%':`${26/scale}px`;
       frames[frames.length-1].backgroundColor=entering?'#dfff3f':'#f2ffd6';
+      if(!entering){
+        // Lose the enlarged shadow before the card returns to its compact home.
+        frames[0].boxShadow=getComputedStyle(element).boxShadow;
+        frames[Math.round((frames.length-1)*.65)].boxShadow='0 0 0 0 rgba(0,0,0,0)';
+        frames[frames.length-1].boxShadow='0 0 0 0 rgba(0,0,0,0)';
+      }
     }
     return element.animate(frames,{
       duration,delay:entering&&isIcon?60:0,easing:'linear',fill:'both'
